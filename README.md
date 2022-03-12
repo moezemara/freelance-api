@@ -1,4 +1,4 @@
-# CIE 206 Course - Freelance
+# CIE 206 Course - Freelance - API
 
 ### Authors :
 ---
