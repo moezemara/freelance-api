@@ -1,6 +1,9 @@
 import express from "express"
+import https from "https"
+import fs from "fs"
+import path from "path"
 import config from "./config/config.js"
-import database from "./Connection/database.js"
+import database from "./connection/database.js"
 import * as response from './config/response.js'
 import userRouter from './v1/user/user.router.js'
 
@@ -34,7 +37,21 @@ app.all("/*", (req, res) => {
   return response.fail(res, "invalid request")
 })
 
+
+try {
+  // certs options
+  var options = {
+    key: fs.readFileSync(path.join(path.resolve('.'), config.certificate.key)),
+    cert: fs.readFileSync(path.join(path.resolve('.'), config.certificate.cert))
+  };
+
+  var server = https.createServer(options, app)
+}catch{
+  console.log('\x1b[31m%s\x1b[0m', "Couldn't find certs. starting without ssl")
+  server = app;
+}
+
 // starts the app
-app.listen(config.port, () => {
+server.listen(config.port, () => {
   console.log('\x1b[32m%s\x1b[0m', "server starting on port : " + config.port)
 })
