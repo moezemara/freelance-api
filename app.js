@@ -2,6 +2,9 @@ import express from "express"
 import https from "https"
 import fs from "fs"
 import path from "path"
+import sessions from 'express-session'
+import {createClient} from 'redis'
+import connectRedis from 'connect-redis'
 import config from "./config/config.js"
 import database from "./connection/database.js"
 import * as response from './config/response.js'
@@ -18,6 +21,37 @@ app.use(function(req, res, next) {
   res.header("Access-Control-Allow-Headers", "Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
   next();
 });
+
+// trusts apache2 proxy (first proxy)
+app.set('trust proxy', 1)
+
+
+const RedisStore = connectRedis(sessions)
+
+//Configure redis client
+const redisClient = createClient({
+  port: config.redis.port,
+  host: config.redis.host,
+  legacyMode: true
+})
+
+await redisClient.connect();
+
+// sessions config
+app.use(sessions({
+    secret: config.session.encryptkey,
+    saveUninitialized: false,
+    name: "SessionID",
+    cookie: { 
+      maxAge: config.session.expire, 
+      secure: config.appmode == "DEVELOPMENT" ? false : true, 
+      sameSite: true, 
+      domain: config.session.domain,
+      httpOnly: false
+    },
+    store: new RedisStore({client: redisClient}),
+    resave: false 
+}));
 
 // enables json mode
 app.use(express.json())
