@@ -32,7 +32,11 @@ export async function login(req, res) {
   }
 
   if (body.password == results.password) {
-    req.session.account_id = results.account_id;
+    req.session.account_id = results.account_id
+    req.session.account_type = results.account_type
+    req.session.verified = results.verified
+    req.session.banned = results.banned
+
     return response.success(res)
   }else {
     return response.fail(res, "invalid username or password")
@@ -81,7 +85,25 @@ export async function signup(req, res) {
 
   try {
     await database.account.insertuser(userdata);
+
+    if (userdata.type == "C"){
+      try {
+        await database.account.insertclientprofile({account_id: userdata.account_id, profile_id: randomUUID()});
+      } catch (error) {
+        try {
+          await database.account.deleteuseraccount({account_id: userdata.account_id})
+        } catch (error) {
+          response.system(res, error)
+        }
+        response.system(res, error)
+      }
+    }
+
     req.session.account_id = userdata.account_id
+    req.session.account_type = userdata.type
+    req.session.verified = "N"
+    req.session.banned = "N"
+
     return response.success(res)
 
   }catch (err) {
@@ -92,8 +114,6 @@ export async function signup(req, res) {
       return response.system(res, err)
     }
   }
-
-  
 }
 
 export async function getallprofiles(req, res) {
@@ -101,6 +121,8 @@ export async function getallprofiles(req, res) {
   if(!req.session.account_id){
     return response.fail(res, 'session expired')
   }
+
+  if(req.session.account_type != "F") {return response.fail(res, "only freelancers allowed")}
 
   try {
     const result = await database.account.selectuserprofiles({account_id: req.session.account_id})
@@ -120,6 +142,8 @@ export async function getprofile(req, res) {
     return response.fail(res, 'session expired')
   }
 
+  if (req.session.account_type != "F") {return response.fail(res, "only freelancers allowed")}
+
   const validate = schema.getprofile_schema.validate(req.params)
   if (validate.error){
     return response.fail(res, validate.error.details[0].message)
@@ -127,10 +151,9 @@ export async function getprofile(req, res) {
 
   try {
     const result = await database.account.selectuserprofile({account_id: req.session.account_id, profile_id: req.params.profile_id})
-
-    if(!result) return response.fail(res, "invalid profile id")
-
-    return response.success(res, result)
+    !result 
+    ? response.fail(res, "invalid profile id")
+    : response.success(res, result)
   } catch (error) {
     return response.system(res, error)
   }
@@ -143,6 +166,8 @@ export async function createprofile(req, res) {
   if(!req.session.account_id){
     return response.fail(res, 'session expired')
   }
+
+  if(req.session.account_type != "F") {return response.fail(res, "only freelancers allowed")}
 
   const validate = schema.createprofile_schema.validate(body)
   if (validate.error){
@@ -168,6 +193,9 @@ export async function updateprofile(req, res) {
     return response.fail(res, 'session expired')
   }
 
+  if(req.session.account_type != "F") {return response.fail(res, "only freelancers allowed")}
+
+
   body.profile_id = req.params.profile_id
 
   const validate = schema.updateprofile_schema.validate(body)
@@ -182,6 +210,25 @@ export async function updateprofile(req, res) {
     result.affectedRows == 0 
     ? response.fail(res, "invalid profile id")
     : response.success(res)
+  } catch (error) {
+    return response.system(res, error)
+  }
+}
+
+export async function getclientprofile(req, res) {
+  const database = req.app.get('database')
+
+  if(!req.session.account_id){
+    return response.fail(res, 'session expired')
+  }
+
+  if (req.session.account_type != "C") {return response.fail(res, "only clients allowed")}
+
+  try {
+    const result = await database.account.selectclientprofile({account_id: req.session.account_id})
+    !result 
+    ? response.fail(res, "user has not created a profile yet")
+    : response.success(res, result)
   } catch (error) {
     return response.system(res, error)
   }

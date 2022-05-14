@@ -6,7 +6,8 @@ export default class Account {
     selectuserbyusername (data){
       return new Promise((resolve, reject) =>{
         this.pool.query(
-          `select * from account where username = ?`,
+          `SELECT account_id, password, account_type, verified, banned 
+          FROM account WHERE username = ?`,
           [
             data.username
           ],
@@ -91,7 +92,7 @@ export default class Account {
     selectuserprofiles (data){
       return new Promise((resolve, reject) =>{
         this.pool.query(
-          `select profile_id, title from freelancer_profile where account_id = ?`,
+          `SELECT profile_id, title FROM freelancer_profile WHERE account_id = ?`,
           [
             data.account_id
           ],
@@ -163,6 +164,64 @@ export default class Account {
             data.description,
             data.account_id,
             data.profile_id
+          ],
+          (error, results, fields) => {
+            if (error) {
+              reject(error)
+            }else{
+              resolve(results)
+            }
+          }
+        );
+      })
+    }
+
+    selectclientprofile (data){
+      return new Promise((resolve, reject) =>{
+        this.pool.query(
+          `SELECT profile_id, total_spent, rating FROM client_profile WHERE account_id = ?`,
+          [
+            data.account_id
+          ],
+          (error, results, fields) => {
+            if (error) {
+              reject(error)
+            }else{
+              resolve(results[0])
+            }
+          }
+        );
+      })
+    }
+
+    insertclientprofile (data){
+      return new Promise((resolve, reject) =>{
+        this.pool.query(
+          `INSERT INTO client_profile (profile_id, account_id)
+          VALUES(?,?)
+          `,
+          [
+            data.profile_id,
+            data.account_id
+          ],
+          (error, results, fields) => {
+            if (error) {
+              reject(error)
+            }else{
+              resolve(results)
+            }
+          }
+        );
+      })
+    }
+
+    deleteuseraccount (data){
+      return new Promise((resolve, reject) =>{
+        this.pool.query(
+          `DELETE FROM account WHERE account_id = ?
+          `,
+          [
+            data.account_id
           ],
           (error, results, fields) => {
             if (error) {
