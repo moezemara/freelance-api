@@ -24,11 +24,15 @@ export const getprofile_schema = joi.object().keys({
   profile_id: joi.string().required()
 })
 
-export const updateprofile_schema = joi.object().keys({
+export const updateprofile_body_schema = joi.object().keys({
   title: joi.string().min(5).max(60).required(),
   skills: joi.array().items(joi.string().required()).required(),
   pay_rate: joi.number().integer().min(0).required(),
   description: joi.string().required(),
+  profile_id: joi.string().required()
+})
+
+export const updateprofile_params_schema = joi.object().keys({
   profile_id: joi.string().required()
 })
 

@@ -1,6 +1,8 @@
 import { createPool } from "mysql";
 import config from '../config/config.js';
 import Account from './account.js'
+import Freelancer from './freelancer.js'
+import Client from './client.js'
 
 const pool = createPool({
   port: config.database.port,
@@ -10,8 +12,9 @@ const pool = createPool({
   database: config.database.database
 })
  
-// import tables and export as single database connection
-
+// export as single database connection
 export default {
-    account: new Account(pool)
+    account: new Account(pool),
+    freelancer: new Freelancer(pool),
+    client: new Client(pool)
 }

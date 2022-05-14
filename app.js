@@ -2,13 +2,13 @@ import express from "express"
 import https from "https"
 import fs from "fs"
 import path from "path"
-import sessions from 'express-session'
-import {createClient} from 'redis'
-import connectRedis from 'connect-redis'
+import session from './src/redis.js'
 import config from "./config/config.js"
 import database from "./connection/database.js"
-import * as response from './config/response.js'
+import * as response from './src/response.js'
 import userRouter from './v1/user/user.router.js'
+import freelancerRouter from './v1/freelancer/freelancer.router.js'
+import clientRouter from './v1/client/client.router.js'
 
 const app = express()
 
@@ -25,33 +25,8 @@ app.use(function(req, res, next) {
 // trusts apache2 proxy (first proxy)
 app.set('trust proxy', 1)
 
-
-const RedisStore = connectRedis(sessions)
-
-//Configure redis client
-const redisClient = createClient({
-  port: config.redis.port,
-  host: config.redis.host,
-  legacyMode: true
-})
-
-await redisClient.connect();
-
-// sessions config
-app.use(sessions({
-    secret: config.session.encryptkey,
-    saveUninitialized: false,
-    name: "SessionID",
-    cookie: { 
-      maxAge: config.session.expire, 
-      secure: config.appmode == "DEVELOPMENT" ? false : true, 
-      sameSite: true, 
-      domain: config.session.domain,
-      httpOnly: false
-    },
-    store: new RedisStore({client: redisClient}),
-    resave: false 
-}));
+// session config
+app.use(session);
 
 // enables json mode
 app.use(express.json())
@@ -65,6 +40,8 @@ app.use(function(err, req, res, next) {
 
 // app base routes
 app.use("/v1/user", userRouter);
+app.use("/v1/freelancer", freelancerRouter);
+app.use("/v1/client", clientRouter);
 
 // handles all the unused links
 app.all("/*", (req, res) => {
