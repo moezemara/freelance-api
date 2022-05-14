@@ -17,7 +17,6 @@ export async function getallprofiles(req, res) {
 
 export async function getprofile(req, res) {
   const database = req.app.get('database')
-
   try {
     const result = await database.freelancer.selectuserprofile({profile_id: req.params.profile_id})
     !result 
@@ -59,3 +58,18 @@ export async function updateprofile(req, res) {
     return response.system(res, error)
   }
 }
+
+export async function activateprofile(req, res) {
+  const database = req.app.get('database')
+  try {
+    const result = await database.freelancer.activateprofile({account_id: req.session.account_id, profile_id: req.params.profile_id})
+    console.log(result)
+    result.affectedRows == 0 
+    ? response.fail(res, "invalid profile id")
+    : response.success(res)
+  } catch (error) {
+    return response.system(res, error)
+  }
+}
+
+
