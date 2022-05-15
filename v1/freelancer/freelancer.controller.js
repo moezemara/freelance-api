@@ -101,3 +101,42 @@ export async function getcontract(req, res) {
     return response.system(res, error)
   }
 }
+
+export async function getallpendingcontracts(req, res) {
+  const database = req.app.get('database')
+  try {
+    const result = await database.freelancer.selectusercontracts_withstatus({freelancer_profile_id: req.session.freelancer_profile_id, status:'pending'})
+
+    if(result.length == 0) return response.fail(res, "you don't have any pending contracts yet")
+
+    return response.success(res, result)
+  } catch (error) {
+    return response.system(res, error)
+  }
+}
+
+export async function getallactivecontracts(req, res) {
+  const database = req.app.get('database')
+  try {
+    const result = await database.freelancer.selectusercontracts_withstatus({freelancer_profile_id: req.session.freelancer_profile_id, status:'active'})
+
+    if(result.length == 0) return response.fail(res, "you don't have any active contracts yet")
+
+    return response.success(res, result)
+  } catch (error) {
+    return response.system(res, error)
+  }
+}
+
+export async function getallarchivedcontracts(req, res) {
+  const database = req.app.get('database')
+  try {
+    const result = await database.freelancer.selectusercontracts_withstatus({freelancer_profile_id: req.session.freelancer_profile_id, status:'archived'})
+
+    if(result.length == 0) return response.fail(res, "you don't have any archived contracts yet")
+
+    return response.success(res, result)
+  } catch (error) {
+    return response.system(res, error)
+  }
+}
