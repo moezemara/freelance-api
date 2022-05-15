@@ -73,3 +73,31 @@ export async function activateprofile(req, res) {
 }
 
 
+
+
+
+
+export async function getallcontracts(req, res) {
+  const database = req.app.get('database')
+  try {
+    const result = await database.freelancer.selectusercontracts({freelancer_profile_id: req.session.freelancer_profile_id})
+
+    if(result.length == 0) return response.fail(res, "you don't have any contracts yet")
+
+    return response.success(res, result)
+  } catch (error) {
+    return response.system(res, error)
+  }
+}
+
+export async function getcontract(req, res) {
+  const database = req.app.get('database')
+  try {
+    const result = await database.freelancer.selectusercontract({contract_id: req.params.contract_id})
+    !result 
+    ? response.fail(res, "invalid contract id")
+    : response.success(res, result)
+  } catch (error) {
+    return response.system(res, error)
+  }
+}

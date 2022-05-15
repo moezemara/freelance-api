@@ -42,3 +42,8 @@ export const createprofile_schema = joi.object().keys({
   pay_rate: joi.number().integer().min(0).required(),
   description: joi.string().required()
 })
+
+
+export const getcontract_schema = joi.object().keys({
+  contract_id: joi.string().required()
+})
