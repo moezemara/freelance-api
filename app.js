@@ -2,6 +2,7 @@ import express from "express"
 import https from "https"
 import fs from "fs"
 import path from "path"
+import helmet from "helmet"
 import session from './src/redis.js'
 import config from "./config/config.js"
 import database from "./connection/database.js"
@@ -16,11 +17,7 @@ const app = express()
 app.set('database', database) // db connection
 
 // sets default headers
-app.use(function(req, res, next) {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Headers", "Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
-  next();
-});
+app.use(helmet())
 
 // trusts apache2 proxy (first proxy)
 app.set('trust proxy', 1)

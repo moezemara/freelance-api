@@ -8,12 +8,12 @@ const router = express.Router()
 
 router.get("/profile", auth.basic, auth.client, getprofile)
 
+router.post("/job") // post a job
+
 router.get("/job") // all posted jobs
 router.get("/job/:job_id") // get details of a job
 router.get("/job/active") // all active jobs (no freelancers hired yet or not disabled)
 router.get("/job/archived") // all finished (freelancers hired), disabled jobs
-
-router.post("/job") // post a job
 
 router.post("/job/:job_id/close") // close current active job
 router.post("/job/:job_id/update")  // update data of current job
