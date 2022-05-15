@@ -1,4 +1,5 @@
-import {getallprofiles, getprofile, createprofile, updateprofile, activateprofile} from './freelancer.controller.js';
+import {getallprofiles, getprofile, createprofile, updateprofile, activateprofile, getallcontracts, getcontract,
+    getallpendingcontracts, getallactivecontracts, getallarchivedcontracts} from './freelancer.controller.js';
 import express from 'express'
 import * as auth from '../../src/authChecker.js'
 import * as schema from '../../config/schema.js'
@@ -25,11 +26,14 @@ router.get("/proposal/archived") // get all proposal which has contract or inact
 router.post("/proposal/:proposal_id/cancel") // cancels active proposal
 router.post("/proposal/:proposal_id/boost") // boosts active proposal (adds badge on it which costs connects)
 
-router.get("/contract") // get all user contracts
-router.get("/contract/:contract_id") // get contract data
-router.get("/contract/pending") // get all contracts not started yet (on interview)
-router.get("/contract/active") // get all ongoing contracts (not yet finished)
-router.get("/contract/archived") // get all finished contracts or unaccepted ones
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////ashmawy done: 1, 2, 3, 4, 5.
+router.get("/contract", auth.basic, auth.freelancer, getallcontracts)  // get all user contracts    
+router.get("/contract/:contract_id", auth.basic, auth.freelancer, schemaChecker.checkparams(schema.getcontract_schema), getcontract) // get contract data
+router.get("/contract/pending", auth.basic, auth.freelancer, getallpendingcontracts) // get all contracts not started yet (on interview)
+router.get("/contract/active", auth.basic, auth.freelancer, getallactivecontracts) // get all ongoing contracts (not yet finished)
+router.get("/contract/archived", auth.basic, auth.freelancer, getallarchivedcontracts) // get all finished contracts or unaccepted ones
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 router.post("/contract/pending/:contract_id/updatestatus") // accept, cancel, end offer
 router.post("/contract/pending/:contract_id/updateprice") // update interview contract price (only when not pending acceptance)
