@@ -8,11 +8,9 @@ import * as schemaChecker from '../../src/schemaChecker.js'
 const router = express.Router()
 
 router.get("/profile", auth.basic, auth.freelancer, getallprofiles) // get all profiles
-router.get("/profile/:profile_id", auth.basic, schemaChecker.checkparams(schema.getprofile_schema), getprofile) // get profile details
-router.post("/profile", auth.basic, auth.freelancer, schemaChecker.checkbody(schema.createprofile_schema), createprofile) // create profile
-router.post("/profile/:profile_id/update", auth.basic, auth.freelancer, 
-schemaChecker.checkparams(schema.updateprofile_params_schema), schemaChecker.checkbody(schema.updateprofile_body_schema), 
-updateprofile) // update profile
+router.get("/profile/:profile_id", auth.basic, getprofile) // get profile details
+router.post("/profile", auth.basic, auth.freelancer, createprofile) // create profile
+router.post("/profile/:profile_id/update", auth.basic, auth.freelancer, updateprofile) // update profile
 
 router.post("/profile/:profile_id/activate", auth.basic, auth.freelancer, activateprofile) // activate profile to be used getting jobs
 router.get("/job") // get all jobs matching active profile skills
@@ -29,7 +27,7 @@ router.post("/proposal/:proposal_id/boost") // boosts active proposal (adds badg
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////ashmawy done: 1, 2, 3, 4, 5.
 router.get("/contract", auth.basic, auth.freelancer, getallcontracts)  // get all user contracts    
-router.get("/contract/:contract_id", auth.basic, auth.freelancer, schemaChecker.checkparams(schema.getcontract_schema), getcontract) // get contract data
+router.get("/contract/:contract_id", auth.basic, auth.freelancer, getcontract) // get contract data
 router.get("/contract/pending", auth.basic, auth.freelancer, getallpendingcontracts) // get all contracts not started yet (on interview)
 router.get("/contract/active", auth.basic, auth.freelancer, getallactivecontracts) // get all ongoing contracts (not yet finished)
 router.get("/contract/archived", auth.basic, auth.freelancer, getallarchivedcontracts) // get all finished contracts or unaccepted ones
