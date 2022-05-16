@@ -13,7 +13,7 @@ export const signup_schema = joi.object().keys({
   password: joi.string().min(2).required(),
   email: joi.string().email({tlds: {allow: false}}).required(),
   type: joi.string().valid('C','F').required(),
-  phone: joi.string().min(2).required(), //was number but it is varchar in schema
+  phone: joi.number().integer().min(0).required(),
   address: joi.string().required(),
   country: joi.string().length(2).required(),
   sex: joi.string().valid('M','F').required(),
