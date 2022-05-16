@@ -118,9 +118,11 @@ export default class Freelancer {
   selectusercontracts (data){
     return new Promise((resolve, reject) =>{
       this.pool.query(
-        `SELECT contract_id FROM contract WHERE freelancer_profile_id = ?`,
+        `SELECT contract_id FROM contract,  WHERE freelancer_profile_id IN
+        (SELECT profile_id from freelancer_profile WHERE account_id = ?)
+        `,
         [
-          data.freelancer_profile_id
+          data.account_id
         ],
         (error, results, fields) => {
           if (error) {
@@ -136,8 +138,10 @@ export default class Freelancer {
   selectusercontract (data){
     return new Promise((resolve, reject) =>{
       this.pool.query(
-        `SELECT proposal_id, status, final_price, milestone_paid, client_profile_id freelancer_profile_id FROM contract WHERE contract_id = ?`,
+        `SELECT proposal_id, status, final_price, milestone_paid, client_profile_id freelancer_profile_id FROM contract
+        WHERE account_id = ? AND contract_id = ?`,
         [
+          data.account_id,
           data.contract_id
         ],
         (error, results, fields) => {
@@ -154,10 +158,11 @@ export default class Freelancer {
   selectusercontracts_withstatus (data){
     return new Promise((resolve, reject) =>{
       this.pool.query(
-        `SELECT contract_id FROM contract WHERE freelancer_profile_id = ? AND status = ?`,
+        `SELECT contract_id FROM contract WHERE  status = ? AND freelancer_profile_id IN
+        (SELECT profile_id from freelancer_profile WHERE account_id = ?)`,
         [
-          data.freelancer_profile_id,
-          data.status
+          data.status,
+          data.account_id
         ],
         (error, results, fields) => {
           if (error) {
