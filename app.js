@@ -42,7 +42,7 @@ app.use("/v1/client", clientRouter);
 
 // handles all the unused links
 app.all("/*", (req, res) => {
-  return response.fail(res, "this invalid request")
+  return response.fail(res, "invalid request")
 })
 
 
