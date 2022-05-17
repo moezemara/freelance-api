@@ -16,8 +16,17 @@ const app = express()
 // global variables in app
 app.set('database', database) // db connection
 
+
+// allow cross origin
+app.use(function(req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
+  next();
+});
+
 // sets default headers
 app.use(helmet())
+
 
 // trusts apache2 proxy (first proxy)
 app.set('trust proxy', 1)
