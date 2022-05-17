@@ -5,11 +5,17 @@ import { randomUUID } from 'crypto'
 export async function getallprofiles(req, res) {
   const database = req.app.get('database')
   try {
-    const result = await database.freelancer.selectuserprofiles({account_id: req.session.account_id})
-
-    if(result.length == 0) return response.fail(res, "you have not created a profile yet")
-
-    return response.success(res, result)
+    const allprofiles = await database.freelancer.selectuserprofiles({account_id: req.session.account_id})
+    if(allprofiles.length == 0) return response.fail(res, "you have not created a profile yet")
+    const activeprofileid = await database.freelancer.selectactiveprofileid({account_id: req.session.account_id})
+    if(!activeprofileid.profile_id) return response.fail(res, "no active profile found")
+    const activeprofile = await database.freelancer.selectuserprofile({profile_id: activeprofileid.profile_id})
+    if(!activeprofile) return response.fail(res, "you have no active profiles")
+    activeprofile.skills = JSON.parse(activeprofile.skills)
+    return response.success(res,{
+      activeprofie: activeprofile,
+      profiles: allprofiles
+    })
   } catch (error) {
     return response.system(res, error)
   }
@@ -19,9 +25,9 @@ export async function getprofile(req, res) {
   const database = req.app.get('database')
   try {
     const result = await database.freelancer.selectuserprofile({profile_id: req.params.profile_id})
-    !result 
-    ? response.fail(res, "invalid profile id")
-    : response.success(res, result)
+    if(!result){return response.fail(res, "invalid profile id")}
+    result.skills = JSON.parse(result.skills)
+    return response.success(res, result)
   } catch (error) {
     return response.system(res, error)
   }
@@ -36,6 +42,11 @@ export async function createprofile(req, res) {
 
   try {
     const result = await database.freelancer.insertuserprofile(body)
+    const activeprofileid = await database.freelancer.selectactiveprofileid({account_id: req.session.account_id})
+    if(!activeprofileid.profile_id) {
+      const result = await database.freelancer.activateprofile(body)
+    }
+
     return response.success(res)
   } catch (error) {
     return response.system(res, error)
@@ -71,11 +82,6 @@ export async function activateprofile(req, res) {
     return response.system(res, error)
   }
 }
-
-
-
-
-
 
 export async function getallcontracts(req, res) {
   const database = req.app.get('database')

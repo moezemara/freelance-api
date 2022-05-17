@@ -24,9 +24,27 @@ export default class Freelancer {
   selectuserprofile (data){
     return new Promise((resolve, reject) =>{
       this.pool.query(
-        `SELECT profile_id, title, skills, pay_rate, rating, description, account_id FROM freelancer_profile WHERE profile_id = ?`,
+        `SELECT profile_id, title, skills, pay_rate, rating, description FROM freelancer_profile WHERE profile_id = ?`,
         [
           data.profile_id
+        ],
+        (error, results, fields) => {
+          if (error) {
+            reject(error)
+          }else{
+            resolve(results[0])
+          }
+        }
+      );
+    })
+  }
+
+  selectactiveprofileid (data){
+    return new Promise((resolve, reject) =>{
+      this.pool.query(
+        `SELECT active_profile_id AS profile_id FROM account WHERE account_id = ?`,
+        [
+          data.account_id
         ],
         (error, results, fields) => {
           if (error) {
