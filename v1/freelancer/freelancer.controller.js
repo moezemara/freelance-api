@@ -80,7 +80,7 @@ export async function activateprofile(req, res) {
 export async function getallcontracts(req, res) {
   const database = req.app.get('database')
   try {
-    const result = await database.freelancer.selectusercontracts({freelancer_profile_id: req.session.freelancer_profile_id})
+    const result = await database.freelancer.selectusercontracts({account_id: req.session.account_id,})
 
     if(result.length == 0) return response.fail(res, "you don't have any contracts yet")
 
@@ -93,7 +93,7 @@ export async function getallcontracts(req, res) {
 export async function getcontract(req, res) {
   const database = req.app.get('database')
   try {
-    const result = await database.freelancer.selectusercontract({contract_id: req.params.contract_id})
+    const result = await database.freelancer.selectusercontract({account_id: req.session.account_id, contract_id: req.params.contract_id})
     !result 
     ? response.fail(res, "invalid contract id")
     : response.success(res, result)
@@ -105,7 +105,7 @@ export async function getcontract(req, res) {
 export async function getallpendingcontracts(req, res) {
   const database = req.app.get('database')
   try {
-    const result = await database.freelancer.selectusercontracts_withstatus({freelancer_profile_id: req.session.freelancer_profile_id, status:'pending'})
+    const result = await database.freelancer.selectusercontracts_withstatus({account_id: req.session.account_id, status:'pending'})
 
     if(result.length == 0) return response.fail(res, "you don't have any pending contracts yet")
 
@@ -118,7 +118,7 @@ export async function getallpendingcontracts(req, res) {
 export async function getallactivecontracts(req, res) {
   const database = req.app.get('database')
   try {
-    const result = await database.freelancer.selectusercontracts_withstatus({freelancer_profile_id: req.session.freelancer_profile_id, status:'active'})
+    const result = await database.freelancer.selectusercontracts_withstatus({account_id: req.session.account_id, status:'active'})
 
     if(result.length == 0) return response.fail(res, "you don't have any active contracts yet")
 
@@ -131,7 +131,7 @@ export async function getallactivecontracts(req, res) {
 export async function getallarchivedcontracts(req, res) {
   const database = req.app.get('database')
   try {
-    const result = await database.freelancer.selectusercontracts_withstatus({freelancer_profile_id: req.session.freelancer_profile_id, status:'archived'})
+    const result = await database.freelancer.selectusercontracts_withstatus({account_id: req.session.account_id, status:'archived'})
 
     if(result.length == 0) return response.fail(res, "you don't have any archived contracts yet")
 
