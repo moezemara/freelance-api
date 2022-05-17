@@ -31,7 +31,7 @@ export async function login(req, res) {
     req.session.verified = results.verified
     req.session.banned = results.banned
 
-    return response.success(res)
+    return response.success(res, {type: results.account_type})
   }else {
     return response.fail(res, "invalid username or password")
   }
@@ -93,7 +93,7 @@ export async function signup(req, res) {
     req.session.verified = "N"
     req.session.banned = "N"
 
-    return response.success(res)
+    return response.success(res, {type: results.account_type})
 
   }catch (err) {
     if(err.code == 'INTERNAL_DUP'){
