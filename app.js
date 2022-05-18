@@ -3,6 +3,8 @@ import https from "https"
 import fs from "fs"
 import path from "path"
 import helmet from "helmet"
+import hpp from "hpp"
+import csurf from "csurf"
 import session from './src/redis.js'
 import config from "./config/config.js"
 import database from "./connection/database.js"
@@ -19,20 +21,28 @@ app.set('database', database) // db connection
 
 // allow cross origin
 app.use(function(req, res, next) {
-  res.header("Access-Control-Allow-Origin", "*");
+  const origin = req.headers.origin
+  if(config.alloweddomain.indexOf(origin) > -1){
+    res.header('Access-Control-Allow-Origin', origin);
+    res.header('Access-Control-Allow-Credentials', true)
+  }
   res.header("Access-Control-Allow-Headers", "Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
   next();
 });
 
 // sets default headers
 app.use(helmet())
-
+app.use(hpp())
 
 // trusts apache2 proxy (first proxy)
 app.set('trust proxy', 1)
 
 // session config
 app.use(session);
+
+// csrf protection
+//app.use(csurf())
+
 
 // enables json mode
 app.use(express.json())

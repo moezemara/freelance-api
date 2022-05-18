@@ -13,8 +13,9 @@ export async function getallprofiles(req, res) {
     if(!activeprofile) return response.fail(res, "you have no active profiles")
     activeprofile.skills = JSON.parse(activeprofile.skills)
     return response.success(res,{
-      activeprofie: activeprofile,
-      profiles: allprofiles
+      profile: activeprofile,
+      ids: allprofiles,
+      accessable: activeprofile.account_id == req.session?.account_id ? true : false
     })
   } catch (error) {
     return response.system(res, error)
@@ -24,10 +25,16 @@ export async function getallprofiles(req, res) {
 export async function getprofile(req, res) {
   const database = req.app.get('database')
   try {
-    const result = await database.freelancer.selectuserprofile({profile_id: req.params.profile_id})
-    if(!result){return response.fail(res, "invalid profile id")}
-    result.skills = JSON.parse(result.skills)
-    return response.success(res, result)
+    const profile = await database.freelancer.selectuserprofile({profile_id: req.params.profile_id})
+    if(!profile){return response.fail(res, "invalid profile id")}
+    const allprofiles = await database.freelancer.selectuserprofiles({account_id: profile.account_id})
+    if(allprofiles.length == 0) return response.fail(res, "user has no profiles")
+    profile.skills = JSON.parse(profile.skills)
+    return response.success(res, {
+      profile: profile,
+      ids: allprofiles,
+      accessable: profile.account_id == req.session?.account_id ? true : false
+    })
   } catch (error) {
     return response.system(res, error)
   }

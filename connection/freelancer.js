@@ -6,7 +6,7 @@ export default class Freelancer {
   selectuserprofiles (data){
     return new Promise((resolve, reject) =>{
       this.pool.query(
-        `SELECT profile_id, title FROM freelancer_profile WHERE account_id = ?`,
+        `SELECT profile_id, title FROM freelancer_profile WHERE account_id = ? AND status = 'A'`,
         [
           data.account_id
         ],
@@ -24,7 +24,7 @@ export default class Freelancer {
   selectuserprofile (data){
     return new Promise((resolve, reject) =>{
       this.pool.query(
-        `SELECT profile_id, title, skills, pay_rate, rating, description FROM freelancer_profile WHERE profile_id = ?`,
+        `SELECT account_id, profile_id, title, skills, pay_rate, rating, description FROM freelancer_profile WHERE profile_id = ? AND status = 'A'`,
         [
           data.profile_id
         ],

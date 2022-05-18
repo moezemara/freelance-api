@@ -7,6 +7,11 @@ import * as schemaChecker from '../../src/schemaChecker.js'
 
 const router = express.Router()
 
+
+
+// to delete profile it must not be active
+// 
+
 router.get("/profile", auth.basic, auth.freelancer, getallprofiles) // get all profiles
 router.get("/profile/:profile_id", auth.basic, getprofile) // get profile details
 router.post("/profile", auth.basic, auth.freelancer, createprofile) // create profile
@@ -32,6 +37,11 @@ router.get("/contract/pending", auth.basic, auth.freelancer, getallpendingcontra
 router.get("/contract/active", auth.basic, auth.freelancer, getallactivecontracts) // get all ongoing contracts (not yet finished)
 router.get("/contract/archived", auth.basic, auth.freelancer, getallarchivedcontracts) // get all finished contracts or unaccepted ones
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+router.get("/contract/:profile_id", auth.basic, getallcontracts) // get all contracts of single profile (used)
+router.get("/contract/:profile_id/active", auth.basic, getallcontracts) // get all contracts of single profile (used)
+router.get("/contract/:profile_id/archived", auth.basic, getallcontracts) // get all contracts of single profile (used)
+
 
 router.post("/contract/pending/:contract_id/updatestatus") // accept, cancel, end offer
 router.post("/contract/pending/:contract_id/updateprice") // update interview contract price (only when not pending acceptance)
