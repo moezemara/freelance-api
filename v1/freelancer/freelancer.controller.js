@@ -11,8 +11,11 @@ export async function getallprofiles(req, res) {
     if(!activeprofileid.profile_id) return response.fail(res, "no active profile found")
     const activeprofile = await database.freelancer.selectuserprofile({profile_id: activeprofileid.profile_id})
     if(!activeprofile) return response.fail(res, "you have no active profiles")
+    const account = await database.account.selectuserbyaccountid({account_id: req.session.account_id})
+    if(!account) return response.fail(res, "invalid account")
     activeprofile.skills = JSON.parse(activeprofile.skills)
     return response.success(res,{
+      account: account,
       profile: activeprofile,
       ids: allprofiles,
       accessable: activeprofile.account_id == req.session?.account_id ? true : false
@@ -29,8 +32,11 @@ export async function getprofile(req, res) {
     if(!profile){return response.fail(res, "invalid profile id")}
     const allprofiles = await database.freelancer.selectuserprofiles({account_id: profile.account_id})
     if(allprofiles.length == 0) return response.fail(res, "user has no profiles")
+    const account = await database.account.selectuserbyaccountid({account_id: profile.account_id})
+    if(!account) return response.fail(res, "invalid account")
     profile.skills = JSON.parse(profile.skills)
     return response.success(res, {
+      account: account,
       profile: profile,
       ids: allprofiles,
       accessable: profile.account_id == req.session?.account_id ? true : false
