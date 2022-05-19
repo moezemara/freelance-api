@@ -25,7 +25,7 @@ export default class Account {
   selectuserbyaccountid (data){
     return new Promise((resolve, reject) =>{
       this.pool.query(
-        `SELECT first_name, last_name, country, sex, profile_picture FROM account WHERE account_id = ?`,
+        `SELECT first_name, last_name, country, active_profile_id, profile_picture FROM account WHERE account_id = ?`,
         [
           data.account_id
         ],

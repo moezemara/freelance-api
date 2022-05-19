@@ -7,17 +7,21 @@ export async function getallprofiles(req, res) {
   try {
     const allprofiles = await database.freelancer.selectuserprofiles({account_id: req.session.account_id})
     if(allprofiles.length == 0) return response.fail(res, "you have not created a profile yet")
-    const activeprofileid = await database.freelancer.selectactiveprofileid({account_id: req.session.account_id})
-    if(!activeprofileid.profile_id) return response.fail(res, "no active profile found")
-    const activeprofile = await database.freelancer.selectuserprofile({profile_id: activeprofileid.profile_id})
-    if(!activeprofile) return response.fail(res, "you have no active profiles")
     const account = await database.account.selectuserbyaccountid({account_id: req.session.account_id})
     if(!account) return response.fail(res, "invalid account")
+    const activeprofile = await database.freelancer.selectuserprofile({profile_id: account.active_profile_id})
+    if(!activeprofile) return response.fail(res, "you have no active profiles")
+
     activeprofile.skills = JSON.parse(activeprofile.skills)
+
+    let {active_profile_id, ...o_account} = account
+    let {account_id, ...o_activeprofile} = activeprofile
+
     return response.success(res,{
-      account: account,
-      profile: activeprofile,
+      account: o_account,
+      profile: o_activeprofile,
       ids: allprofiles,
+      active_id: active_profile_id,
       accessable: activeprofile.account_id == req.session?.account_id ? true : false
     })
   } catch (error) {
@@ -34,11 +38,16 @@ export async function getprofile(req, res) {
     if(allprofiles.length == 0) return response.fail(res, "user has no profiles")
     const account = await database.account.selectuserbyaccountid({account_id: profile.account_id})
     if(!account) return response.fail(res, "invalid account")
+
+    let {active_profile_id, ...o_account} = account
+    let {account_id, ...o_profile} = profile
+
     profile.skills = JSON.parse(profile.skills)
     return response.success(res, {
-      account: account,
-      profile: profile,
+      account: o_account,
+      profile: o_profile,
       ids: allprofiles,
+      active_id: active_profile_id,
       accessable: profile.account_id == req.session?.account_id ? true : false
     })
   } catch (error) {
@@ -99,9 +108,9 @@ export async function activateprofile(req, res) {
 export async function getallcontracts(req, res) {
   const database = req.app.get('database')
   try {
-    const result = await database.freelancer.selectusercontracts({account_id: req.session.account_id,})
+    const result = await database.freelancer.selectusercontracts({account_id: req.session.account_id})
 
-    if(result.length == 0) return response.fail(res, "you don't have any contracts yet")
+    if(result.length == 0) return response.fail(res, "no contracts found")
 
     return response.success(res, result)
   } catch (error) {
