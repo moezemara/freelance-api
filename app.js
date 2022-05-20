@@ -12,6 +12,7 @@ import * as response from './src/response.js'
 import userRouter from './v1/user/user.router.js'
 import freelancerRouter from './v1/freelancer/freelancer.router.js'
 import clientRouter from './v1/client/client.router.js'
+import jobRouter from './v1/job/job.router.js'
 
 const app = express()
 
@@ -55,9 +56,10 @@ app.use(function(err, req, res, next) {
 })
 
 // app base routes
-app.use("/v1/user", userRouter);
-app.use("/v1/freelancer", freelancerRouter);
-app.use("/v1/client", clientRouter);
+app.use("/v1/user", userRouter)
+app.use("/v1/freelancer", freelancerRouter)
+app.use("/v1/client", clientRouter)
+app.use("/v1/job", jobRouter)
 
 // handles all the unused links
 app.all("/*", (req, res) => {
