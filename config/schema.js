@@ -20,19 +20,11 @@ export const signup_schema = joi.object().keys({
   'g-recaptcha-response': joi.string().required()
 })
 
-export const getprofile_schema = joi.object().keys({
-  profile_id: joi.string().required()
-})
-
 export const updateprofile_body_schema = joi.object().keys({
   title: joi.string().min(5).max(60).required(),
   skills: joi.array().items(joi.string().required()).required(),
   pay_rate: joi.number().integer().min(0).required(),
   description: joi.string().required(),
-  profile_id: joi.string().required()
-})
-
-export const updateprofile_params_schema = joi.object().keys({
   profile_id: joi.string().required()
 })
 
@@ -43,7 +35,12 @@ export const createprofile_schema = joi.object().keys({
   description: joi.string().required()
 })
 
-
-export const getcontract_schema = joi.object().keys({
-  contract_id: joi.string().required()
+export const createjob_schema = joi.object().keys({
+  title: joi.string().min(5).max(60).required(),
+  category: joi.string().max(30).required(),
+  experience: joi.string().valid("Advanced","Intermediate","Entry").required(),
+  skills: joi.array().items(joi.string().required()).required(),
+  description: joi.string().max(1000).required(),
+  price: joi.number().integer().min(1).required(),
+  time: joi.number().integer().min(1).required()
 })
