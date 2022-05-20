@@ -21,6 +21,25 @@ export default class Client {
     })
   }
 
+  selectaccount (data){
+    return new Promise((resolve, reject) =>{
+      this.pool.query(
+        `SELECT first_name, last_name, country, profile_picture FROM account WHERE account_id = ?`,
+        [
+          data.account_id
+        ],
+        (error, results, fields) => {
+          if (error) {
+            reject(error)
+          }else{
+            resolve(results[0])
+          }
+        }
+      );
+    })
+  }
+
+
   insertprofile (data){
     return new Promise((resolve, reject) =>{
       this.pool.query(
