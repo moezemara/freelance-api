@@ -86,7 +86,7 @@ export default class Freelancer {
     return new Promise((resolve, reject) =>{
       this.pool.query(
         `UPDATE freelancer_profile SET title = ?, skills = ?, pay_rate = ?, description = ?
-        WHERE account_id = ? AND profile_id = ?
+        WHERE account_id = ? AND profile_id = ? AND status = 'A'
         `,
         [
           data.title,
@@ -130,7 +130,27 @@ export default class Freelancer {
     })
   }
 
-
+  deleteprofile (data){
+    return new Promise((resolve, reject) =>{
+      this.pool.query(
+        `UPDATE freelancer_profile SET status = 'D' WHERE profile_id = ? AND account_id = ? AND status = 'A' AND ? != 
+        (SELECT active_profile_id FROM account WHERE account_id = ?)`,
+        [
+          data.profile_id,
+          data.account_id,
+          data.profile_id,
+          data.account_id
+        ],
+        (error, results, fields) => {
+          if (error) {
+            reject(error)
+          }else{
+            resolve(results)
+          }
+        }
+      );
+    })
+  }
 
 
   selectusercontracts (data){

@@ -96,8 +96,30 @@ export async function activateprofile(req, res) {
   const database = req.app.get('database')
   try {
     const result = await database.freelancer.activateprofile({account_id: req.session.account_id, profile_id: req.params.profile_id})
-    console.log(result)
     result.affectedRows == 0 
+    ? response.fail(res, "invalid profile id")
+    : response.success(res)
+  } catch (error) {
+    return response.system(res, error)
+  }
+}
+
+export async function deleteprofile(req, res) {
+  const database = req.app.get('database')
+  try {
+    const activeprofileid = await database.freelancer.selectactiveprofileid({account_id: req.session.account_id})
+    if(!activeprofileid){return response.fail(res, "no active profile found")}
+    const result = await database.freelancer.deleteprofile(
+      {
+        account_id: req.session.account_id, 
+        profile_id: req.params.profile_id, 
+        activeprofileid: activeprofileid.profile_id
+      }
+    )
+    if(result.affectedRows == 0 && activeprofileid.profile_id == req.params.profile_id)
+    {return response.fail(res, "you can not delete active profiles")}
+    
+    result.affectedRows == 0
     ? response.fail(res, "invalid profile id")
     : response.success(res)
   } catch (error) {

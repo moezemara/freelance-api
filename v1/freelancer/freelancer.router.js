@@ -1,4 +1,4 @@
-import {getallprofiles, getprofile, createprofile, updateprofile, activateprofile, getallcontracts, getcontract,
+import {getallprofiles, getprofile, createprofile, updateprofile, activateprofile, deleteprofile, getallcontracts, getcontract,
     getallpendingcontracts, getallactivecontracts, getallarchivedcontracts} from './freelancer.controller.js';
 import express from 'express'
 import * as auth from '../../src/authChecker.js'
@@ -7,17 +7,14 @@ import * as schemaChecker from '../../src/schemaChecker.js'
 
 const router = express.Router()
 
-
-
-// to delete profile it must not be active
-// 
-
 router.get("/profile", auth.basic, auth.freelancer, getallprofiles) // get all profiles
 router.get("/profile/:profile_id", auth.basic, getprofile) // get profile details
 router.post("/profile", auth.basic, auth.freelancer, createprofile) // create profile
 router.post("/profile/:profile_id/update", auth.basic, auth.freelancer, updateprofile) // update profile
-
 router.post("/profile/:profile_id/activate", auth.basic, auth.freelancer, activateprofile) // activate profile to be used getting jobs
+router.post("/profile/:profile_id/delete", auth.basic, auth.freelancer, deleteprofile) // delete profile
+
+
 router.get("/job") // get all jobs matching active profile skills
 router.get("/job/:job_id") // get details of a job
 
@@ -28,7 +25,6 @@ router.get("/proposal/archived") // get all proposal which has contract or inact
 
 router.post("/proposal/:proposal_id/cancel") // cancels active proposal
 router.post("/proposal/:proposal_id/boost") // boosts active proposal (adds badge on it which costs connects)
-
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////ashmawy done: 1, 2, 3, 4, 5.
 router.get("/contract", auth.basic, auth.freelancer, getallcontracts)  // get all user contracts    
