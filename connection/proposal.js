@@ -55,7 +55,7 @@ export default class Proposal {
   selectpendingproposals (data){
     return new Promise((resolve, reject) =>{
       this.pool.query(
-        `SELECT * FROM proposal, freelancer_profile as freelancer WHERE proposal.freelancer_profile_id = freelancer.profile_id AND
+        `SELECT proposal.* FROM proposal, freelancer_profile as freelancer WHERE proposal.freelancer_profile_id = freelancer.profile_id AND
         proposal.status = "Pending" AND freelancer.account_id = ?
         `,
         [
@@ -129,7 +129,38 @@ export default class Proposal {
           if (error) {
             reject(error)
           }else{
-            resolve(results[0])
+            resolve(results)
+          }
+        }
+      );
+    })
+  }
+
+  deleteproposal (data){
+    return new Promise((resolve, reject) =>{
+      this.pool.query(
+        `UPDATE proposal SET proposal.status = 'Archived' WHERE proposal.status = 'Pending' AND proposal.proposal_id = ? AND
+        (SELECT SUM(CASE 
+                        WHEN proposal.freelancer_profile_id IN 
+                            (SELECT freelancer_profile.profile_id FROM freelancer_profile WHERE freelancer_profile.account_id = ?)
+                        THEN 1
+                        WHEN proposal.client_profile_id IN 
+                            (SELECT client_profile.profile_id FROM client_profile WHERE client_profile.account_id = ?)
+                        THEN 1
+                        ELSE 0
+                    END
+                   )) > 0
+        `,
+        [
+          data.proposal_id,
+          data.account_id,
+          data.account_id
+        ],
+        (error, results, fields) => {
+          if (error) {
+            reject(error)
+          }else{
+            resolve(results)
           }
         }
       );

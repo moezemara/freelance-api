@@ -1,4 +1,4 @@
-import {applytojob, getpendingproposals, getproposalsofjob} from './proposal.controller.js';
+import {applytojob, getpendingproposals, getproposalsofjob, withdrawproposal} from './proposal.controller.js';
 import express from 'express'
 import * as schema from '../../config/schema.js'
 import * as schemaChecker from '../../src/schemaChecker.js'
@@ -10,7 +10,7 @@ router.post("/apply/:job_id", auth.basic, auth.freelancer, schemaChecker.checkbo
 router.get("/get/pending", auth.basic, auth.freelancer, getpendingproposals) // get all applied proposals
 router.get("/get/proposals/:job_id", auth.basic, auth.client, getproposalsofjob) // get pending applied proposals of certain job
 
-router.post("/:proposal_id/cancel") // cancels active proposal
+router.post("/:proposal_id/withdraw", auth.basic, withdrawproposal) // cancel pending proposal by both client and freelancer
 router.post("/:proposal_id/boost") // boosts active proposal (adds badge on it which costs connects)
 
 export default router;
