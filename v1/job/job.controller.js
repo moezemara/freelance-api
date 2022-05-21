@@ -41,3 +41,27 @@ export async function getactivejobs(req, res) {
     return response.system(res, error)
   }
 }
+
+export async function browsejobs(req, res) {
+  const database = req.app.get('database');
+
+  try {
+    const activeprofileid = await database.freelancer.selectactiveprofileid({account_id: req.session.account_id})
+    if(!activeprofileid){return response.fail(res, "no active profile found")}
+    const activeprofile = await database.freelancer.selectuserprofile({profile_id: activeprofileid.profile_id})
+    if(!activeprofile){return response.fail(res, "invalid profile")}
+    const profileskills = JSON.parse(activeprofile.skills)
+
+    const alljobs = []
+    for(const skill of profileskills){
+      const jobs = await database.job.selectjobswithskill({skill: skill})
+      alljobs.push(...jobs)
+    }
+
+    const unique_jobs = [...new Map(alljobs.map(job => [job.job_id, v])).values()]
+
+    return response.success(res, unique_jobs)
+  } catch (error) {
+    return response.system(res, error)
+  }
+}
