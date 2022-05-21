@@ -67,4 +67,23 @@ export default class Job {
       );
     })
   }
+
+  
+  selectjob (data){
+    return new Promise((resolve, reject) =>{
+      this.pool.query(
+        `SELECT * FROM job WHERE job_id = ?`,
+        [
+          data.job_id
+        ],
+        (error, results, fields) => {
+          if (error) {
+            reject(error)
+          }else{
+            resolve(results[0])
+          }
+        }
+      );
+    })
+  }
 }

@@ -65,3 +65,17 @@ export async function browsejobs(req, res) {
     return response.system(res, error)
   }
 }
+
+export async function getjob(req, res) {
+  const database = req.app.get('database');
+
+  try {
+    const job = await database.job.selectjob({job_id: req.params.job_id})
+    if(!job){return response.fail(res, "invalid job")}
+
+    job.skills = JSON.parse(job.skills)
+    return response.success(res, job)
+  } catch (error) {
+    return response.system(res, error)
+  }
+}
