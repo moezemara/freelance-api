@@ -6,9 +6,8 @@ import * as auth from '../../src/authChecker.js'
 
 const router = express.Router()
 
-router.post("/apply/:job_id", auth.basic, auth.freelancer, schemaChecker.checkbody(schema.applytojob_schema), applytojob)
+router.post("/apply/:job_id", auth.basic, auth.freelancer, schemaChecker.checkbody(schema.applytojob_schema), applytojob) // apply to a job
 
-router.post("/proposal") // post proposal to a job
 router.get("/proposal") // get all applied proposals
 router.get("/proposal/active") // get all proposal which still has job active
 router.get("/proposal/archived") // get all proposal which has contract or inactive job or canceld ones

@@ -60,8 +60,8 @@ export default class Freelancer {
   insertuserprofile (data){
     return new Promise((resolve, reject) =>{
       this.pool.query(
-        `INSERT INTO freelancer_profile (profile_id, title, skills, pay_rate, description, account_id)
-        VALUES(?,?,?,?,?,?)
+        `INSERT INTO freelancer_profile (profile_id, title, skills, pay_rate, description, category, account_id)
+        VALUES(?,?,?,?,?,?,?)
         `,
         [
           data.profile_id,
@@ -69,6 +69,7 @@ export default class Freelancer {
           JSON.stringify(data.skills),
           data.pay_rate,
           data.description,
+          data.category,
           data.account_id
         ],
         (error, results, fields) => {
@@ -85,7 +86,7 @@ export default class Freelancer {
   updateuserprofile (data){
     return new Promise((resolve, reject) =>{
       this.pool.query(
-        `UPDATE freelancer_profile SET title = ?, skills = ?, pay_rate = ?, description = ?
+        `UPDATE freelancer_profile SET title = ?, skills = ?, pay_rate = ?, description = ?, category = ?
         WHERE account_id = ? AND profile_id = ? AND status = 'A'
         `,
         [
@@ -93,6 +94,7 @@ export default class Freelancer {
           JSON.stringify(data.skills),
           data.pay_rate,
           data.description,
+          data.category,
           data.account_id,
           data.profile_id
         ],
