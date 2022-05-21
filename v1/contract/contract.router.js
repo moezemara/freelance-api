@@ -9,8 +9,8 @@ const router = express.Router()
 
 router.post("/:proposal_id/accept", auth.basic, auth.client, acceptproposal) // start contract interview out of a proposal
 
-router.get("/contract/:profile_id/active", auth.basic, getactivecontracts_viewer) // get active contracts on profile
-router.get("/contract/:profile_id/archived", auth.basic, getarchivedcontracts_viewer) // get finished contracts on profile
+router.get("/:profile_id/active", auth.basic, getactivecontracts_viewer) // get active contracts on profile
+router.get("/:profile_id/archived", auth.basic, getarchivedcontracts_viewer) // get finished contracts on profile
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////ashmawy done: 1, 2, 3, 4, 5.
 //router.get("/contract", auth.basic, auth.freelancer, getallcontracts)  // get all user contracts    

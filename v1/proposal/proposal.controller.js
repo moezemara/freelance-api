@@ -40,3 +40,16 @@ export async function getpendingproposals(req, res) {
     return response.system(res, error)
   }
 }
+
+export async function getproposalsofjob(req, res) {
+  const database = req.app.get('database');
+  
+  try {
+    const proposals = await database.proposal.selectjobproposals({account_id: req.session.account_id, job_id: req.params.job_id, status: "pending"})
+    if(proposals.length == 0){ return response.fail(res, "no proposals found")}
+    
+    return response.success(res, proposals)
+  } catch (error) {
+    return response.system(res, error)
+  }
+}
