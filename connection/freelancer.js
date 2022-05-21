@@ -152,7 +152,6 @@ export default class Freelancer {
     })
   }
 
-
   selectusercontracts (data){
     return new Promise((resolve, reject) =>{
       this.pool.query(

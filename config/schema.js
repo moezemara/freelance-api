@@ -1,8 +1,8 @@
 import joi from 'joi'
 
 export const login_schema = joi.object().keys({
-  username: joi.required(),
-  password: joi.required(),
+  username: joi.string().max(30).required(),
+  password: joi.string().max(30).required(),
   'g-recaptcha-response': joi.string().required()
 })
 
@@ -14,7 +14,7 @@ export const signup_schema = joi.object().keys({
   email: joi.string().email({tlds: {allow: false}}).required(),
   type: joi.string().valid('C','F').required(),
   phone: joi.number().integer().min(0).required(),
-  address: joi.string().required(),
+  address: joi.string().max(200).required(),
   country: joi.string().length(2).required(),
   sex: joi.string().valid('M','F').required(),
   'g-recaptcha-response': joi.string().required()
@@ -23,8 +23,8 @@ export const signup_schema = joi.object().keys({
 export const updateprofile_body_schema = joi.object().keys({
   title: joi.string().min(5).max(60).required(),
   skills: joi.array().items(joi.string().required()).required(),
-  pay_rate: joi.number().integer().min(0).required(),
-  description: joi.string().required(),
+  pay_rate: joi.number().integer().min(1).required(),
+  description: joi.string().max(1000).required(),
   profile_id: joi.string().required()
 })
 
@@ -32,7 +32,7 @@ export const createprofile_schema = joi.object().keys({
   title: joi.string().min(5).max(60).required(),
   skills: joi.array().items(joi.string().required()).required(),
   pay_rate: joi.number().integer().min(0).required(),
-  description: joi.string().required()
+  description: joi.string().max(1000).required()
 })
 
 export const createjob_schema = joi.object().keys({
@@ -43,4 +43,10 @@ export const createjob_schema = joi.object().keys({
   description: joi.string().max(1000).required(),
   price: joi.number().integer().min(1).required(),
   time: joi.number().integer().min(1).required()
+})
+
+export const applytojob_schema = joi.object().keys({
+  cover_letter: joi.string().max(2000).required(),
+  price: joi.number().integer().min(1).required(),
+  expected_date: joi.number().integer().required()
 })

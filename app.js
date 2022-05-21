@@ -14,6 +14,7 @@ import freelancerRouter from './v1/freelancer/freelancer.router.js'
 import clientRouter from './v1/client/client.router.js'
 import jobRouter from './v1/job/job.router.js'
 import contractRouter from './v1/contract/contract.router.js'
+import proposalRouter from './v1/proposal/proposal.router.js'
 
 const app = express()
 
@@ -61,6 +62,7 @@ app.use("/v1/user", userRouter)
 app.use("/v1/freelancer", freelancerRouter)
 app.use("/v1/client", clientRouter)
 app.use("/v1/job", jobRouter)
+app.use("/v1/proposal", proposalRouter)
 app.use("/v1/contract", contractRouter)
 
 // handles all the unused links
