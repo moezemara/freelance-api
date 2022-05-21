@@ -153,46 +153,6 @@ export default class Freelancer {
       );
     })
   }
-
-  selectusercontracts (data){
-    return new Promise((resolve, reject) =>{
-      this.pool.query(
-        `SELECT contract_id FROM contract,  WHERE freelancer_profile_id IN
-        (SELECT profile_id from freelancer_profile WHERE account_id = ?)
-        `,
-        [
-          data.account_id
-        ],
-        (error, results, fields) => {
-          if (error) {
-            reject(error)
-          }else{
-            resolve(results)
-          }
-        }
-      );
-    })
-  } 
-
-  selectusercontract (data){
-    return new Promise((resolve, reject) =>{
-      this.pool.query(
-        `SELECT proposal_id, status, final_price, milestone_paid, client_profile_id freelancer_profile_id FROM contract
-        WHERE account_id = ? AND contract_id = ?`,
-        [
-          data.account_id,
-          data.contract_id
-        ],
-        (error, results, fields) => {
-          if (error) {
-            reject(error)
-          }else{
-            resolve(results[0])
-          }
-        }
-      );
-    })
-  }
 }
 
 

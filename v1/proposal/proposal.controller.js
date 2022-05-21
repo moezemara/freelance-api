@@ -27,3 +27,16 @@ export async function applytojob(req, res) {
     return response.system(res, error)
   }
 }
+
+export async function getpendingproposals(req, res) {
+  const database = req.app.get('database');
+  
+  try {
+    const proposals = await database.proposal.selectpendingproposals({account_id: req.session.account_id})
+    if(proposals.length == 0){ return response.fail(res, "no proposals found")}
+    
+    return response.success(res, proposals)
+  } catch (error) {
+    return response.system(res, error)
+  }
+}
