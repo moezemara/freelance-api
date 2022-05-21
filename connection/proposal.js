@@ -76,7 +76,7 @@ export default class Proposal {
     return new Promise((resolve, reject) =>{
       this.pool.query(
         `SELECT proposal.* FROM proposal, client_profile WHERE proposal.client_profile_id = client_profile.profile_id
-        AND client_profile.account_id = ? AND proposal.proposal_id = ?
+        AND proposal.status = 'Pending' AND client_profile.account_id = ? AND proposal.proposal_id = ?
         `,
         [
           data.account_id,

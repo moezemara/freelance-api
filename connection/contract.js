@@ -68,7 +68,7 @@ export default class Contract {
   insertcontract (data){
     return new Promise((resolve, reject) =>{
       this.pool.query(
-        `INSERT INTO contract (proposal_id, final_price, client_profile_if, freelancer_profile_id)
+        `INSERT INTO contract (proposal_id, final_price, client_profile_id, freelancer_profile_id)
         VALUES(?,?,?,?)`,
         [
           data.proposal_id,

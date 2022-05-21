@@ -25,8 +25,7 @@ export const updateprofile_body_schema = joi.object().keys({
   skills: joi.array().items(joi.string().required()).required(),
   pay_rate: joi.number().integer().min(1).required(),
   description: joi.string().max(1000).required(),
-  category: joi.string().max(30).required(),
-  profile_id: joi.string().required()
+  category: joi.string().max(30).required()
 })
 
 export const createprofile_schema = joi.object().keys({

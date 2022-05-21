@@ -7,19 +7,15 @@ const router = express.Router()
 
 
 
-router.post("/:proposal_id/accept", auth.basic, auth.client, acceptproposal) // start contract interview out of a proposal
+router.post("/proposal/:proposal_id/accept", auth.basic, auth.client, acceptproposal) // start contract interview out of a proposal
 
-router.get("/:profile_id/active", auth.basic, getactivecontracts_viewer) // get active contracts on profile
-router.get("/:profile_id/archived", auth.basic, getarchivedcontracts_viewer) // get finished contracts on profile
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////ashmawy done: 1, 2, 3, 4, 5.
-//router.get("/contract", auth.basic, auth.freelancer, getallcontracts)  // get all user contracts    
-//router.get("/contract/:contract_id", auth.basic, auth.freelancer, getcontract) // get contract data
-//router.get("/contract/pending", auth.basic, auth.freelancer, getallpendingcontracts) // get all contracts not started yet (on interview)
-//router.get("/contract/active", auth.basic, auth.freelancer, getallactivecontracts) // get all ongoing contracts (not yet finished)
-//router.get("/contract/archived", auth.basic, auth.freelancer, getallarchivedcontracts) // get all finished contracts or unaccepted ones
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+router.get("/active", auth.basic) // active contracts
+router.get("/archived", auth.basic) // finished contracts
+router.get("/pending", auth.basic) // on interviews
 
+router.get("/profile/:profile_id/active", auth.basic, getactivecontracts_viewer) // get active contracts on freelancer profile
+router.get("/profile/:profile_id/archived", auth.basic, getarchivedcontracts_viewer) // get finished contracts on freelancer profile
 
 router.post("/contract/pending/:contract_id/updatestatus") // accept, cancel, end offer
 router.post("/contract/pending/:contract_id/updateprice") // update interview contract price (only when not pending acceptance)
