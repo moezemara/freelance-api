@@ -63,3 +63,31 @@ export async function getarchivedcontracts_viewer(req, res) {
     return response.system(res, error)
   }
 }
+
+export async function acceptproposal(req, res) {
+  const database = req.app.get('database')
+  
+  try {
+    const data = {}
+    const proposal = await database.proposal.selectproposal({account_id: req.session.account_id, proposal_id: req.params.proposal_id})
+    if(!proposal){ return response.fail(res, "invalid proposal")}
+
+
+    data.proposal_id = req.params.proposal_id
+    data.client_profile_id = proposal.client_profile_id
+    data.freelancer_profile_id = proposal.freelancer_profile_id
+    data.final_price = proposal.price
+
+    const result = await database.contract.insertcontract(data)
+
+    if(result.affectedRows != 0){
+      await database.proposal.updateproposalstatus({proposal_id: req.params.proposal_id, status: "Archived"})
+      return response.success(res, "interview started")
+    }else{
+      return response.system(res, result)
+    }
+
+  } catch (error) {
+    return response.system(res, error)
+  }
+}

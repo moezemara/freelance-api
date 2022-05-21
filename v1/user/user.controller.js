@@ -93,7 +93,7 @@ export async function signup(req, res) {
     req.session.verified = "N"
     req.session.banned = "N"
 
-    return response.success(res, {type: results.account_type})
+    return response.success(res, {type: userdata.account_type})
 
   }catch (err) {
     if(err.code == 'INTERNAL_DUP'){
