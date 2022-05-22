@@ -14,7 +14,7 @@ router.get("/pending", auth.basic, getcontractsbystatus("Interview")) // on inte
 router.get("/profile/:profile_id/active", auth.basic, getactivecontracts_viewer) // get active contracts on freelancer profile
 router.get("/profile/:profile_id/archived", auth.basic, getarchivedcontracts_viewer) // get finished contracts on freelancer profile
 
-router.post("/contract/pending/:contract_id/updatestatus") // accept, cancel, end offer
+router.post("/contract/pending/:contract_id/updatestatus") // accept, cancel offer
 router.post("/contract/pending/:contract_id/updateprice") // update interview contract price (only when not pending acceptance)
 
 router.get("/contract/:contract_id/milestone") // get milestones of a contract

@@ -58,7 +58,7 @@ export async function browsejobs(req, res) {
       alljobs.push(...jobs)
     }
 
-    const unique_jobs = [...new Map(alljobs.map(job => [job.job_id, v])).values()]
+    const unique_jobs = [...new Map(alljobs.map(job => [job.job_id, job])).values()]
 
     return response.success(res, unique_jobs)
   } catch (error) {
