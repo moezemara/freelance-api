@@ -36,7 +36,7 @@ export default class Proposal {
     return new Promise((resolve, reject) =>{
       this.pool.query(
         `SELECT client.profile_id FROM job, client_profile AS client 
-        WHERE job.client_profile_id = client.profile_id AND job.status = 'active' AND job.job_id = ?
+        WHERE job.client_profile_id = client.profile_id AND job.status = 'Active' AND job.job_id = ?
         `,
         [
           data.job_id

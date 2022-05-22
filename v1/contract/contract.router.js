@@ -1,18 +1,15 @@
-import {getactivecontracts_viewer, getarchivedcontracts_viewer, acceptproposal} from './contract.controller.js';
+import {getactivecontracts_viewer, getarchivedcontracts_viewer, acceptproposal, getcontractsbystatus} from './contract.controller.js';
 import express from 'express'
 import * as schema from '../../config/schema.js'
 import * as schemaChecker from '../../src/schemaChecker.js'
 import * as auth from '../../src/authChecker.js'
 const router = express.Router()
 
-
-
 router.post("/proposal/:proposal_id/accept", auth.basic, auth.client, acceptproposal) // start contract interview out of a proposal
 
-
-router.get("/active", auth.basic) // active contracts
-router.get("/archived", auth.basic) // finished contracts
-router.get("/pending", auth.basic) // on interviews
+router.get("/active", auth.basic, getcontractsbystatus("Active")) // active contracts
+router.get("/archived", auth.basic, getcontractsbystatus("Archived")) // finished contracts
+router.get("/pending", auth.basic, getcontractsbystatus("Interview")) // on interviews
 
 router.get("/profile/:profile_id/active", auth.basic, getactivecontracts_viewer) // get active contracts on freelancer profile
 router.get("/profile/:profile_id/archived", auth.basic, getarchivedcontracts_viewer) // get finished contracts on freelancer profile
