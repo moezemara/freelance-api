@@ -13,7 +13,7 @@ export function checkstatus(contract){
             cancel: false,
             edit: false
         },
-        status: 'Pending',
+        status: 'Interview',
         special_status: false
     }
 

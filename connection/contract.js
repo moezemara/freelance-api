@@ -111,7 +111,6 @@ export default class Contract {
     })
   }
 
-  
   updatepeerstatus (data){
     return new Promise((resolve, reject) =>{
 

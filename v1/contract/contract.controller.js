@@ -9,7 +9,11 @@ export async function getcontract(req, res) {
     const contract = await database.contract.selectcontract({account_id: req.session.account_id, account_type: req.session.account_type, proposal_id: req.params.contract_id})
     if(!contract) return response.fail(res, "invalid contract")
 
-    return response.success(res, contract)
+    if(contract.status == 'Interview'){
+      var permissions = interviewstatus.checkstatus(contract)
+    }
+
+    return response.success(res, {contract: contract, permissions: permissions})
   } catch (error) {
     return response.system(res, error)
   }
