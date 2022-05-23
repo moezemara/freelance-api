@@ -3,34 +3,26 @@ export default class Contract {
       this.pool = pool
   }
 
-  selectusercontracts (data){
+  selectcontract (data){
     return new Promise((resolve, reject) =>{
-      this.pool.query(
-        `SELECT contract_id FROM contract,  WHERE freelancer_profile_id IN
-        (SELECT profile_id from freelancer_profile WHERE account_id = ?)
-        `,
-        [
-          data.account_id
-        ],
-        (error, results, fields) => {
-          if (error) {
-            reject(error)
-          }else{
-            resolve(results)
-          }
-        }
-      );
-    })
-  } 
+      if(data.account_type == "F"){
+        var query = 
+        `SELECT contract.* FROM contract, freelancer_profile AS freelancer 
+        WHERE contract.freelancer_profile_id = freelancer.profile_id 
+        AND freelancer.account_id = ? AND contract.proposal_id = ?`
+      }else if (data.account_type == "C"){
+        var query = 
+        `SELECT contract.* FROM contract, client_profile AS client 
+        WHERE contract.client_profile_id = client.profile_id 
+        AND client.account_id = ? AND contract.proposal_id = ?
+        `
+      }
 
-  selectusercontract (data){
-    return new Promise((resolve, reject) =>{
       this.pool.query(
-        `SELECT proposal_id, status, final_price, milestone_paid, client_profile_id freelancer_profile_id FROM contract
-        WHERE account_id = ? AND contract_id = ?`,
+        query,
         [
           data.account_id,
-          data.contract_id
+          data.proposal_id
         ],
         (error, results, fields) => {
           if (error) {
@@ -41,7 +33,7 @@ export default class Contract {
         }
       );
     })
-  }
+  } 
 
   selectcontracts_viewer (data){
     return new Promise((resolve, reject) =>{
@@ -113,6 +105,38 @@ export default class Contract {
             reject(error)
           }else{
             resolve(results)
+          }
+        }
+      );
+    })
+  }
+
+  
+  updatepeerstatus (data){
+    return new Promise((resolve, reject) =>{
+
+      if(data.account_type == "F"){
+        var query = 
+        `UPDATE contract SET freelancer_acceptance = ?, status = ? WHERE contract.proposal_id = ?`
+      }else if (data.account_type == "C"){
+        var query = 
+        `
+        UPDATE contract SET client_acceptance = ?, status = ?  WHERE contract.proposal_id = ?
+        `
+      }
+
+      this.pool.query(
+        query,
+        [
+          data.input,
+          data.status,
+          data.proposal_id
+        ],
+        (error, results, fields) => {
+          if (error) {
+            reject(error)
+          }else{
+            resolve(results[0])
           }
         }
       );

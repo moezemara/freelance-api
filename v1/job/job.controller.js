@@ -59,6 +59,10 @@ export async function browsejobs(req, res) {
     }
 
     const unique_jobs = [...new Map(alljobs.map(job => [job.job_id, job])).values()]
+    
+    for (const key in unique_jobs) {
+      unique_jobs[key].skills = JSON.parse(unique_jobs[key].skills)
+    }
 
     return response.success(res, unique_jobs)
   } catch (error) {
