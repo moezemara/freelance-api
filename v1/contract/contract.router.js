@@ -16,7 +16,7 @@ router.get("/profile/:profile_id/archived", auth.basic, getarchivedcontracts_vie
 
 router.get("/:contract_id", auth.basic, getcontract) // get contract data
 
-router.post("/:contract_id/updatestatus", auth.basic, updatepeerstatus) // accept, cancel offer
+router.post("/:contract_id/updatestatus", auth.basic, schemaChecker.checkbody(schema.updatepeerstatus_schema), updatepeerstatus) // accept, cancel offer
 router.post("/:contract_id/updateprice") // update interview contract price (only when not pending acceptance)
 
 router.get("/:contract_id/milestone") // get milestones of a contract

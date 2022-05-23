@@ -51,3 +51,8 @@ export const applytojob_schema = joi.object().keys({
   price: joi.number().integer().min(1).required(),
   expected_date: joi.number().integer().required()
 })
+
+export const updatepeerstatus_schema = joi.object().keys({
+  input: joi.string().valid("Accept", "Cancel")
+})
+

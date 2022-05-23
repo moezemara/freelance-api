@@ -32,8 +32,8 @@ export function checkstatus(contract){
         allowed.client.edit = true;
         allowed.special_status = 'NAN'
     }else if(contract.freelancer_acceptance == '1' && contract.client_acceptance == '1'){
-        allowed.status = 'Accept';
-        allowed.special_status = 'Accept';
+        allowed.status = 'Active';
+        allowed.special_status = 'Active';
     }
 
     return allowed;
@@ -48,13 +48,19 @@ export function handlepermissions(res, status, account_type, input){
         if(account_type == "F" && input == 1){
           return response.fail(res, "you can not accept")
         }
-      }else if(status.special_status == 'Pending Freelancer'){
+    }
+    else if(status.special_status == 'Pending Freelancer'){
         if(account_type == "C" && input == 1){
           return response.fail(res, "you can not accept")
         }
   
         if(account_type == "F" && input == 0){
           return response.fail(res, "you can not cancel")
+        }
+    }
+    else if(status.special_status == 'NAN'){
+        if (input == 0){
+          return response.fail(res, "you can not cancel")   
         }
     }
     return false

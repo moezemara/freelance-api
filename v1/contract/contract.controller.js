@@ -2,6 +2,7 @@ import config from '../../config/config.js'
 import * as response from '../../src/response.js'
 import { randomUUID } from 'crypto'
 import * as interviewstatus from './src/checkstatus.js'
+import { exit } from 'process'
 
 export async function getcontract(req, res) {
   const database = req.app.get('database')
@@ -98,24 +99,25 @@ export async function updatepeerstatus(req, res) {
     if(!contract) return response.fail(res, "invalid contract")
     if(contract.status == 'Active') return response.fail(res, "contract is already active")
     const status = interviewstatus.checkstatus(contract)
+    
     // check what is possible
     const interview_result = interviewstatus.handlepermissions(res, status, account_type, input)
     if(interview_result) return interview_result
-
+    
     // pre-updated status
     if(account_type == 'C'){
       var updated_contract = contract
-      updated_contract.input
+      updated_contract.client_acceptance = input
     }else if(account_type == 'F'){
       var updated_contract = contract
-      updated_contract.input
+      updated_contract.freelancer_acceptance = input
     }
 
     // check pre-updated status
     const pre_updated_status = interviewstatus.checkstatus(updated_contract)
     
     // update if possible
-    const update_result = database.contract.updatepeerstatus({input: input, proposal_id: req.params.proposal_id, status: pre_updated_status.status})
+    const update_result = await database.contract.updatepeerstatus({input: input, proposal_id: req.params.contract_id, status: pre_updated_status.status, account_type: account_type})
     if(update_result.affectedRows != 0){
       return response.success(res, pre_updated_status)
     }else{
