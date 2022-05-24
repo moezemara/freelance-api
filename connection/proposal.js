@@ -167,6 +167,29 @@ export default class Proposal {
     })
   }
 
+  selectproposalaccountnames (data){
+    return new Promise((resolve, reject) =>{
+      this.pool.query(
+        `SELECT 
+        (SELECT CONCAT(account.first_name, ' ', account.last_name) FROM proposal, freelancer_profile AS profile, account WHERE proposal.freelancer_profile_id = profile.profile_id AND profile.account_id = account.account_id AND proposal.proposal_id = @proposal_id) 
+        AS freelancer_name, 
+        (SELECT CONCAT(account.first_name, ' ', account.last_name) FROM proposal, client_profiler_profile AS profile, account WHERE proposal.client_profile_id_profile_id = profile.profile_id AND profile.account_id = account.account_id AND proposal.proposal_id = @proposal_id)
+        AS client_name
+        `,
+        [
+          data.proposal_id
+        ],
+        (error, results, fields) => {
+          if (error) {
+            reject(error)
+          }else{
+            resolve(results[0])
+          }
+        }
+      );
+    })
+  }
+
 }
 
 
