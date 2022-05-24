@@ -2,6 +2,7 @@ import config from '../../config/config.js'
 import * as response from '../../src/response.js'
 import * as recaptcha from '../../src/recaptcha.js'
 import { randomUUID } from 'crypto'
+import bcrypt from 'bcryptjs'
 
 export async function login(req, res) {
   const database = req.app.get('database');
@@ -25,7 +26,9 @@ export async function login(req, res) {
     return response.fail(res, "invalid username or password")
   }
 
-  if (body.password == results.password) {
+  const compare = bcrypt.compareSync(body.password, results.password);
+
+  if (compare) {
     req.session.account_id = results.account_id
     req.session.account_type = results.account_type
     req.session.verified = results.verified
@@ -58,6 +61,9 @@ export async function signup(req, res) {
     }
   }
   
+  const salt = bcrypt.genSaltSync(10)
+  body.password = bcrypt.hashSync(body.password, salt)
+
   const userdata = {
     account_id: randomUUID(),
     fname: body.fname,
