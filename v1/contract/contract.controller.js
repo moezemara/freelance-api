@@ -14,6 +14,11 @@ export async function getcontract(req, res) {
       var permissions = interviewstatus.checkstatus(contract)
     }
 
+    const names = await database.contract.selectcontractaccountnames({proposal_id: contract.proposal_id})
+    contract.client_name = names.client_name
+    contract.freelancer_name = names.freelancer_name
+    
+
     const milestones = await database.contract.selectmilestones({
       account_type: req.session.account_type, 
       proposal_id: req.params.contract_id,
@@ -32,6 +37,12 @@ export async function getactivecontracts_viewer(req, res) {
     const contracts = await database.contract.selectcontracts_viewer({profile_id: req.params.profile_id, status:'Active'})
     if(contracts.length == 0) return response.fail(res, "no contracts found")
 
+    for (const key in contracts) {
+      const names = await database.contract.selectcontractaccountnames({proposal_id: contracts[key].proposal_id})
+      contracts[key].client_name = names.client_name
+      contracts[key].freelancer_name = names.freelancer_name
+    }
+
     return response.success(res, contracts)
   } catch (error) {
     return response.system(res, error)
@@ -43,6 +54,12 @@ export async function getarchivedcontracts_viewer(req, res) {
   try {
     const contracts = await database.contract.selectcontracts_viewer({profile_id: req.params.profile_id, status:'Archived'})
     if(contracts.length == 0) return response.fail(res, "no contracts found")
+
+    for (const key in contracts) {
+      const names = await database.contract.selectcontractaccountnames({proposal_id: contracts[key].proposal_id})
+      contracts[key].client_name = names.client_name
+      contracts[key].freelancer_name = names.freelancer_name
+    }
 
     return response.success(res, contracts)
   } catch (error) {
@@ -89,6 +106,13 @@ export function getcontractsbystatus(status) {
       const contracts = await database.contract.selectcontracts({account_id: req.session.account_id, account_type: req.session.account_type, status: status})
       if(contracts.length == 0) return response.fail(res, "no contracts found")
   
+
+      for (const key in contracts) {
+        const names = await database.contract.selectcontractaccountnames({proposal_id: contracts[key].proposal_id})
+        contracts[key].client_name = names.client_name
+        contracts[key].freelancer_name = names.freelancer_name
+      }
+
       return response.success(res, contracts)
     } catch (error) {
       return response.system(res, error)
