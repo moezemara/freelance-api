@@ -142,38 +142,6 @@ export default class Contract {
     })
   }
 
-  selectcontract (data){
-    return new Promise((resolve, reject) =>{
-      if(data.account_type == "F"){
-        var query = 
-        `SELECT contract.* FROM contract, freelancer_profile AS freelancer 
-        WHERE contract.freelancer_profile_id = freelancer.profile_id 
-        AND freelancer.account_id = ? AND contract.proposal_id = ?`
-      }else if (data.account_type == "C"){
-        var query = 
-        `SELECT contract.* FROM contract, client_profile AS client 
-        WHERE contract.client_profile_id = client.profile_id 
-        AND client.account_id = ? AND contract.proposal_id = ?
-        `
-      }
-
-      this.pool.query(
-        query,
-        [
-          data.account_id,
-          data.proposal_id
-        ],
-        (error, results, fields) => {
-          if (error) {
-            reject(error)
-          }else{
-            resolve(results[0])
-          }
-        }
-      );
-    })
-  } 
-
   cancelcontract (data){
     return new Promise((resolve, reject) =>{
       this.pool.query(
@@ -301,7 +269,7 @@ export default class Contract {
   endmilestone (data){
     return new Promise((resolve, reject) =>{
       this.pool.query(
-        `UPDATE milestone SET status = 'Finished' WHERE status = 'Active' AND milestone_id = ?`,
+        `UPDATE milestone SET status = 'Finished' WHERE status = 'Pending' AND milestone_id = ?`,
         [
           data.milestone_id
         ],
@@ -358,8 +326,6 @@ export default class Contract {
       );
     })
   }
-
-
 }
 
 

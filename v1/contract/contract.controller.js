@@ -2,7 +2,6 @@ import config from '../../config/config.js'
 import * as response from '../../src/response.js'
 import { randomUUID } from 'crypto'
 import * as interviewstatus from './src/checkstatus.js'
-import { exit } from 'process'
 
 export async function getcontract(req, res) {
   const database = req.app.get('database')
@@ -10,14 +9,16 @@ export async function getcontract(req, res) {
     const contract = await database.contract.selectcontract({account_id: req.session.account_id, account_type: req.session.account_type, proposal_id: req.params.contract_id})
     if(!contract) return response.fail(res, "invalid contract")
 
-    if(contract.status == 'Interview'){
-      var permissions = interviewstatus.checkstatus(contract)
-    }
+    //if(contract.status == 'Interview'){
+    var permissions = interviewstatus.checkstatus(contract)
+    //}
 
     const names = await database.contract.selectcontractaccountnames({proposal_id: contract.proposal_id})
     contract.client_name = names.client_name
     contract.freelancer_name = names.freelancer_name
     
+    const description = await database.proposal.selectproposaljobdescription({proposal_id: contract.proposal_id})
+    contract.description = description.description
 
     const milestones = await database.contract.selectmilestones({
       account_type: req.session.account_type, 
@@ -39,6 +40,8 @@ export async function getactivecontracts_viewer(req, res) {
 
     for (const key in contracts) {
       const names = await database.contract.selectcontractaccountnames({proposal_id: contracts[key].proposal_id})
+      const description = await database.proposal.selectproposaljobdescription({proposal_id: contracts[key].proposal_id})
+      contracts[key].description = description.description
       contracts[key].client_name = names.client_name
       contracts[key].freelancer_name = names.freelancer_name
     }
@@ -57,6 +60,8 @@ export async function getarchivedcontracts_viewer(req, res) {
 
     for (const key in contracts) {
       const names = await database.contract.selectcontractaccountnames({proposal_id: contracts[key].proposal_id})
+      const description = await database.proposal.selectproposaljobdescription({proposal_id: contracts[key].proposal_id})
+      contracts[key].description = description.description
       contracts[key].client_name = names.client_name
       contracts[key].freelancer_name = names.freelancer_name
     }
@@ -109,6 +114,8 @@ export function getcontractsbystatus(status) {
 
       for (const key in contracts) {
         const names = await database.contract.selectcontractaccountnames({proposal_id: contracts[key].proposal_id})
+        const description = await database.proposal.selectproposaljobdescription({proposal_id: contracts[key].proposal_id})
+        contracts[key].description = description.description
         contracts[key].client_name = names.client_name
         contracts[key].freelancer_name = names.freelancer_name
       }
@@ -281,7 +288,7 @@ export async function endmilestone(req, res) {
     if(contract.status != 'Active') return response.fail(res, "contract must be active")
 
     const result = await database.contract.endmilestone({
-      milestone_id: req.params.contract_id
+      milestone_id: req.params.milestone_id
     })
 
     if(result.affectedRows != 0){

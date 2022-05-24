@@ -30,7 +30,7 @@ export function checkstatus(contract){
         allowed.client.accept = true;
         allowed.freelancer.edit = true;
         allowed.client.edit = true;
-        allowed.special_status = 'NAN'
+        allowed.special_status = 'NAN';
     }else if(contract.freelancer_acceptance == '1' && contract.client_acceptance == '1'){
         allowed.status = 'Active';
         allowed.special_status = 'Active';

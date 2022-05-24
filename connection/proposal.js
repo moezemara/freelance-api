@@ -191,6 +191,24 @@ export default class Proposal {
     })
   }
 
+  selectproposaljobdescription (data){
+    return new Promise((resolve, reject) =>{
+      this.pool.query(
+        `SELECT job.description FROM proposal, job WHERE proposal.job_id = job.job_id AND proposal.proposal_id = ?
+        `,
+        [
+          data.proposal_id
+        ],
+        (error, results, fields) => {
+          if (error) {
+            reject(error)
+          }else{
+            resolve(results[0])
+          }
+        }
+      );
+    })
+  }
 }
 
 
