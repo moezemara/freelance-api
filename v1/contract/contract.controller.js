@@ -14,7 +14,13 @@ export async function getcontract(req, res) {
       var permissions = interviewstatus.checkstatus(contract)
     }
 
-    return response.success(res, {contract: contract, permissions: permissions})
+    const milestones = await database.contract.selectmilestones({
+      account_type: req.session.account_type, 
+      proposal_id: req.params.contract_id,
+      account_id: req.session.account_id
+    })
+
+    return response.success(res, {contract: contract, permissions: permissions, milestones: milestones})
   } catch (error) {
     return response.system(res, error)
   }
@@ -123,7 +129,120 @@ export async function updatepeerstatus(req, res) {
     }else{
       return response.system(res, result)
     }
-    return response.success(res, contract)
+  } catch (error) {
+    return response.system(res, error)
+  }
+}
+
+export async function getmilestone(req, res) {
+  const database = req.app.get('database')
+  try {
+    const milestone = await database.contract.selectmilestone({
+      account_type: req.session.account_type, 
+      milestone_id: req.params.milestone_id, 
+      proposal_id: req.params.contract_id,
+      account_id: req.session.account_id
+    })
+
+    if(milestone.length == 0) return response.fail(res, "invalid milestone")
+
+    return response.success(res, milestone)
+  } catch (error) {
+    return response.system(res, error)
+  }
+}
+
+export async function getmilestones(req, res) {
+  const database = req.app.get('database')
+  try {
+    const milestones = await database.contract.selectmilestones({
+      account_type: req.session.account_type, 
+      proposal_id: req.params.contract_id,
+      account_id: req.session.account_id
+    })
+
+    return response.success(res, milestones)
+  } catch (error) {
+    return response.system(res, error)
+  }
+}
+
+export async function addmilestone(req, res) {
+  const database = req.app.get('database')
+  const body = req.body;
+  try {
+    // check if possible to add
+    const contract = await database.contract.selectcontract({account_id: req.session.account_id, account_type: req.session.account_type, proposal_id: req.params.contract_id})
+    if(!contract) return response.fail(res, "invalid contract")
+    if(contract.status != 'Interview') return response.fail(res, "you can not add on active contracts")
+    const status = interviewstatus.checkstatus(contract)
+
+    if(status.special_status != 'NAN'){
+      return response.fail(res, "you are not allowed to edit")
+    }
+
+    const data = {
+      milestone_id: randomUUID(),
+      proposal_id: contract_id,
+      amount: body.amount,
+      description: body.description,
+      date: body.date
+    }
+
+    const milestones = await database.contract.insertmilestone(data)
+
+    return response.success(res)
+  } catch (error) {
+    return response.system(res, error)
+  }
+}
+
+export async function deletemilestone(req, res) {
+  const database = req.app.get('database')
+  const body = req.body;
+  try {
+    // check if possible to add
+    const contract = await database.contract.selectcontract({account_id: req.session.account_id, account_type: req.session.account_type, proposal_id: req.params.contract_id})
+    if(!contract) return response.fail(res, "invalid contract")
+    if(contract.status != 'Interview') return response.fail(res, "you can not add on active contracts")
+    const status = interviewstatus.checkstatus(contract)
+
+    if(status.special_status != 'NAN'){
+      return response.fail(res, "you are not allowed to edit")
+    }
+
+    const result = await database.contract.deletemilestone({milestone_id: req.params.milestone_id})
+
+    if(result.affectedRows != 0){
+      return response.success(res)
+    }else{
+      return response.fail(res, "invalid milestone")
+    }
+
+    return response.success(res)
+  } catch (error) {
+    return response.system(res, error)
+  }
+}
+
+export async function endmilestone(req, res) {
+  const database = req.app.get('database')
+  try {
+
+    const contract = await database.contract.selectcontract({account_id: req.session.account_id, account_type: req.session.account_type, proposal_id: req.params.contract_id})
+    if(!contract) return response.fail(res, "invalid contract")
+    if(contract.status != 'Active') return response.fail(res, "contract must be active")
+
+    const result = await database.contract.endmilestone({
+      milestone_id: req.params.contract_id
+    })
+
+    if(result.affectedRows != 0){
+      return response.success(res)
+    }else{
+      return response.fail(res, "invalid milestone")
+    }
+    
   } catch (error) {
     return response.system(res, error)
   }

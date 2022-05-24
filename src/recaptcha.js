@@ -12,7 +12,6 @@ async function request(url){
 
 
 export async function verify(token, ip) {
-    return true
     if (token === undefined || token === '' || token === null) {
         return false;
     }

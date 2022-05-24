@@ -56,3 +56,9 @@ export const updatepeerstatus_schema = joi.object().keys({
   input: joi.string().valid("Accept", "Cancel")
 })
 
+export const addmilestone_schema = joi.object().keys({
+  description: joi.string().max(2000).required(),
+  amount: joi.number().integer().min(1).required(),
+  date: joi.number().integer().required()
+})
+
