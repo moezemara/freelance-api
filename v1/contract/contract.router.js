@@ -1,4 +1,4 @@
-import {getcontract, getactivecontracts_viewer, getarchivedcontracts_viewer, acceptproposal, getcontractsbystatus, updatepeerstatus, getmilestone, getmilestones, addmilestone, deletemilestone, endmilestone} from './contract.controller.js';
+import {getcontract, getactivecontracts_viewer, getarchivedcontracts_viewer, acceptproposal, getcontractsbystatus, updatepeerstatus, getmilestone, getmilestones, addmilestone, deletemilestone, endmilestone, endcontract} from './contract.controller.js';
 import express from 'express'
 import * as schema from '../../config/schema.js'
 import * as schemaChecker from '../../src/schemaChecker.js'
@@ -25,7 +25,7 @@ router.post("/:contract_id/milestone/:milestone_id/add", auth.basic, schemaCheck
 router.post("/:contract_id/milestone/:milestone_id/remove", auth.basic, deletemilestone) // 
 router.post("/:contract_id/milestone/:milestone_id/end", auth.basic, endmilestone) // end milestone status
 
-router.post("/:contract_id/end") // end contract only when active
+router.post("/:contract_id/end", auth.basic, endcontract) // end contract only when active
 
 // feedbacks only available when contract ends
 router.post("/:contract_id/feedback/add") // add feedback to contract

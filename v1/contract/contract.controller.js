@@ -247,3 +247,26 @@ export async function endmilestone(req, res) {
     return response.system(res, error)
   }
 }
+
+export async function endcontract(req, res) {
+  const database = req.app.get('database')
+  try {
+
+    const contract = await database.contract.selectcontract({account_id: req.session.account_id, account_type: req.session.account_type, proposal_id: req.params.contract_id})
+    if(!contract) return response.fail(res, "invalid contract")
+    if(contract.status != 'Active') return response.fail(res, "contract must be active")
+
+    const result = await database.contract.endcontract({
+      proposal_id: req.params.contract_id
+    })
+
+    if(result.affectedRows != 0){
+      return response.success(res)
+    }else{
+      return response.fail(res, "invalid contract")
+    }
+    
+  } catch (error) {
+    return response.system(res, error)
+  }
+}
