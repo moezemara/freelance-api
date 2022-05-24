@@ -53,7 +53,7 @@ export const applytojob_schema = joi.object().keys({
 })
 
 export const updatepeerstatus_schema = joi.object().keys({
-  input: joi.string().valid("Accept", "Cancel")
+  input: joi.string().valid("Accept", "Cancel").required()
 })
 
 export const addmilestone_schema = joi.object().keys({

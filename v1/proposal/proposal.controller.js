@@ -40,6 +40,12 @@ export async function getpendingproposals(req, res) {
     const proposals = await database.proposal.selectpendingproposals({account_id: req.session.account_id})
     if(proposals.length == 0){ return response.fail(res, "no proposals found")}
     
+    for (const key in proposals) {
+      const names = await database.proposal.selectproposalaccountnames({proposal_id: proposals[key].proposal_id})
+      proposals[key].client_name = names.client_name
+      proposals[key].freelancer_name = names.freelancer_name
+    }
+
     return response.success(res, proposals)
   } catch (error) {
     return response.system(res, error)
@@ -52,6 +58,12 @@ export async function getproposalsofjob(req, res) {
   try {
     const proposals = await database.proposal.selectjobproposals({account_id: req.session.account_id, job_id: req.params.job_id, status: "Pending"})
     if(proposals.length == 0){ return response.fail(res, "no proposals found")}
+    
+    for (const key in proposals) {
+      const names = await database.proposal.selectproposalaccountnames({proposal_id: proposals[key].proposal_id})
+      proposals[key].client_name = names.client_name
+      proposals[key].freelancer_name = names.freelancer_name
+    }
     
     return response.success(res, proposals)
   } catch (error) {

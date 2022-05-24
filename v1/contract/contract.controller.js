@@ -206,7 +206,7 @@ export async function addmilestone(req, res) {
 
     const data = {
       milestone_id: randomUUID(),
-      proposal_id: contract_id,
+      proposal_id: req.params.contract_id,
       amount: body.amount,
       description: body.description,
       date: body.date
