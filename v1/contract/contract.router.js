@@ -22,7 +22,9 @@ router.post("/:contract_id/updateprice") // update interview contract price (onl
 
 router.get("/:contract_id/milestone", auth.basic, getmilestones) // get milestones of a contract
 router.get("/:contract_id/milestone/:milestone_id", auth.basic, getmilestone) // get milestone data
-router.post("/:contract_id/milestone/:milestone_id/add", auth.basic, schemaChecker.checkbody(schema.addmilestone_schema), addmilestone) // add milestone only to (pending and active contracts)
+
+router.post("/:contract_id/milestone/add", auth.basic, schemaChecker.checkbody(schema.addmilestone_schema), addmilestone) // add milestone only to (pending and active contracts)
+
 router.post("/:contract_id/milestone/:milestone_id/remove", auth.basic, deletemilestone) // 
 router.post("/:contract_id/milestone/:milestone_id/end", auth.basic, endmilestone) // end milestone status
 

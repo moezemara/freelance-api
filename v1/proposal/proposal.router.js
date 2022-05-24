@@ -4,7 +4,6 @@ import * as schema from '../../config/schema.js'
 import * as schemaChecker from '../../src/schemaChecker.js'
 import * as auth from '../../src/authChecker.js'
 
-
 const router = express.Router()
 
 router.post("/apply/:job_id", auth.basic, auth.freelancer, schemaChecker.checkbody(schema.applytojob_schema), applytojob) // apply to a job
