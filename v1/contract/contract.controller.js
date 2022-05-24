@@ -96,6 +96,29 @@ export function getcontractsbystatus(status) {
   }
 }
 
+export async function cancelinterview(req, res) {
+  const database = req.app.get('database')
+  try {
+
+    const contract = await database.contract.selectcontract({account_id: req.session.account_id, account_type: req.session.account_type, proposal_id: req.params.contract_id})
+    if(!contract) return response.fail(res, "invalid contract")
+    if(contract.status != 'Interview') return response.fail(res, "contract must be in interview")
+
+    const result = await database.contract.cancelcontract({
+      proposal_id: req.params.contract_id
+    })
+
+    if(result.affectedRows != 0){
+      return response.success(res)
+    }else{
+      return response.fail(res, "invalid contract")
+    }
+    
+  } catch (error) {
+    return response.system(res, error)
+  }
+}
+
 export async function updatepeerstatus(req, res) {
   const database = req.app.get('database')
   try {

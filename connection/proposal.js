@@ -139,7 +139,7 @@ export default class Proposal {
   deleteproposal (data){
     return new Promise((resolve, reject) =>{
       this.pool.query(
-        `UPDATE proposal SET proposal.status = 'Archived' WHERE proposal.status = 'Pending' AND proposal.proposal_id = ? AND
+        `UPDATE proposal SET proposal.status = 'Canceled' WHERE proposal.status = 'Pending' AND proposal.proposal_id = ? AND
         (SELECT SUM(CASE 
                         WHEN proposal.freelancer_profile_id IN 
                             (SELECT freelancer_profile.profile_id FROM freelancer_profile WHERE freelancer_profile.account_id = ?)

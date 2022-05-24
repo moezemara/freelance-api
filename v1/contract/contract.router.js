@@ -1,4 +1,4 @@
-import {getcontract, getactivecontracts_viewer, getarchivedcontracts_viewer, acceptproposal, getcontractsbystatus, updatepeerstatus, getmilestone, getmilestones, addmilestone, deletemilestone, endmilestone, endcontract} from './contract.controller.js';
+import {getcontract, getactivecontracts_viewer, getarchivedcontracts_viewer, acceptproposal, getcontractsbystatus, updatepeerstatus, getmilestone, getmilestones, addmilestone, deletemilestone, endmilestone, endcontract, cancelinterview} from './contract.controller.js';
 import express from 'express'
 import * as schema from '../../config/schema.js'
 import * as schemaChecker from '../../src/schemaChecker.js'
@@ -15,6 +15,7 @@ router.get("/profile/:profile_id/active", auth.basic, getactivecontracts_viewer)
 router.get("/profile/:profile_id/archived", auth.basic, getarchivedcontracts_viewer) // get finished contracts on freelancer profile
 
 router.get("/:contract_id", auth.basic, getcontract) // get contract data
+router.post("/:contract_id/cancel", auth.basic, cancelinterview) // cancel interview
 
 router.post("/:contract_id/updatestatus", auth.basic, schemaChecker.checkbody(schema.updatepeerstatus_schema), updatepeerstatus) // accept, cancel offer
 router.post("/:contract_id/updateprice") // update interview contract price (only when not pending acceptance)

@@ -63,7 +63,7 @@ export async function withdrawproposal(req, res) {
   const database = req.app.get('database');
   
   try {
-    const result = await database.proposal.deleteproposal({account_id: req.session.account_id, proposal_id: req.params.proposal_id, status: "Pending"})
+    const result = await database.proposal.deleteproposal({account_id: req.session.account_id, proposal_id: req.params.proposal_id})
     if(result.affectedRows == 0){ return response.fail(res, "invalid proposal")}
     
     return response.success(res, "proposal deleted")
