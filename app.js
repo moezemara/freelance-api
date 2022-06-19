@@ -5,6 +5,7 @@ import path from "path"
 import helmet from "helmet"
 import hpp from "hpp"
 import csurf from "csurf"
+import {Server} from "socket.io"
 import session from './src/redis.js'
 import config from "./config/config.js"
 import database from "./connection/database.js"
@@ -15,6 +16,8 @@ import clientRouter from './v1/client/client.router.js'
 import jobRouter from './v1/job/job.router.js'
 import contractRouter from './v1/contract/contract.router.js'
 import proposalRouter from './v1/proposal/proposal.router.js'
+import globalRouter from './v1/global/global.router.js'
+
 
 const app = express()
 
@@ -58,6 +61,7 @@ app.use(function(err, req, res, next) {
 })
 
 // app base routes
+app.use("/v1/global", globalRouter)
 app.use("/v1/user", userRouter)
 app.use("/v1/freelancer", freelancerRouter)
 app.use("/v1/client", clientRouter)
