@@ -1,12 +1,13 @@
 import express from "express"
 import https from "https"
+import http from "http"
 import fs from "fs"
 import path from "path"
 import helmet from "helmet"
 import hpp from "hpp"
 import csurf from "csurf"
 import {Server} from "socket.io"
-import session from './src/redis.js'
+import {session, wrap} from './src/redis.js'
 import config from "./config/config.js"
 import database from "./connection/database.js"
 import * as response from './src/response.js'
@@ -20,6 +21,37 @@ import globalRouter from './v1/global/global.router.js'
 
 
 const app = express()
+
+try {
+  // certs options
+  var options = {
+    key: fs.readFileSync(path.join(path.resolve('.'), config.certificate.key)),
+    cert: fs.readFileSync(path.join(path.resolve('.'), config.certificate.cert))
+  };
+
+  var server = https.createServer(options, app)
+}catch{
+  console.log('\x1b[31m%s\x1b[0m', "Couldn't find certs. starting without ssl")
+  server = http.createServer(app);
+}
+
+// chat part 
+const io = new Server(server, { cors: {
+  origin: "https://dashboard.plebits.com",
+  methods: ["GET", "POST"],
+  credentials: true
+} });
+
+io.use(wrap(session))
+
+io.on("connect", socket => {
+  console.log(socket.id)
+  console.log(socket.request.session.account_id)
+
+  socket.on('add', () => {
+    console.log('adddd')
+  })
+})
 
 // global variables in app
 app.set('database', database) // db connection
@@ -73,20 +105,6 @@ app.use("/v1/contract", contractRouter)
 app.all("/*", (req, res) => {
   return response.fail(res, "invalid request")
 })
-
-
-try {
-  // certs options
-  var options = {
-    key: fs.readFileSync(path.join(path.resolve('.'), config.certificate.key)),
-    cert: fs.readFileSync(path.join(path.resolve('.'), config.certificate.cert))
-  };
-
-  var server = https.createServer(options, app)
-}catch{
-  console.log('\x1b[31m%s\x1b[0m', "Couldn't find certs. starting without ssl")
-  server = app;
-}
 
 // starts the app
 server.listen(config.port, () => {

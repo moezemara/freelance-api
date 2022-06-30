@@ -14,7 +14,7 @@ const redisClient = createClient({
 
 await redisClient.connect();
 
-export default sessions({
+export const session = sessions({
     secret: config.session.encryptkey,
     saveUninitialized: false,
     name: "SessionID",
@@ -28,3 +28,7 @@ export default sessions({
     store: new RedisStore({client: redisClient}),
     resave: false 
 })
+
+export const wrap = expressMiddleWare => (socket, next) => {
+  expressMiddleWare(socket.request, {}, next)
+}
