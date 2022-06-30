@@ -37,7 +37,7 @@ try {
 
 // chat part 
 const io = new Server(server, { cors: {
-  origin: "https://dashboard.plebits.com",
+  origin: "https://homielancer.com",
   methods: ["GET", "POST"],
   credentials: true
 } });
