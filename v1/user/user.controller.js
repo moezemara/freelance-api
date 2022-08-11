@@ -110,3 +110,37 @@ export async function signup(req, res) {
     }
   }
 }
+
+export async function updateaccountdata(req, res) {
+  const database = req.app.get('database')
+  const attribute = req.body.attribute
+  const allowed_attributes = ['first_name', 'last_name', 'password', 'email', 'phone', 'address', 'country', 'sex']
+
+  if(!attribute in allowed_attributes){
+    return response.fail(res)
+  }
+
+  if(attribute == 'password'){
+    const salt = bcrypt.genSaltSync(10)
+    req.body.data = bcrypt.hashSync(req.body.data, salt)
+  }
+
+  try {
+    await database.account.updateaccountdata(
+      {
+        attribute: attribute, 
+        data: req.body.data, 
+        account_id: req.session.account_id
+      })
+    const user = await database.account.selectuserbyaccountid({account_id: req.session.account_id})
+    return response.success(res, "data updated")
+
+  } catch (error) {
+    if(error.code == 'ER_DUP_ENTRY' && attribute == 'email'){
+      return response.fail(res, "an account with this email address already exists") 
+    }else if(error.code == 'ER_DUP_ENTRY' && attribute == 'phone'){
+      return response.fail(res, "an account with this phone already exists") 
+    }
+    return response.system(res, error)
+  }
+}

@@ -1,4 +1,5 @@
 import joi from 'joi'
+import countries from '../src/countries.js'
 
 export const login_schema = joi.object().keys({
   username: joi.string().max(30).required(),
@@ -14,8 +15,8 @@ export const signup_schema = joi.object().keys({
   email: joi.string().email({tlds: {allow: false}}).required(),
   type: joi.string().valid('C','F').required(),
   phone: joi.number().integer().min(0).required(),
-  address: joi.string().max(200).required(),
-  country: joi.string().length(2).required(),
+  address: joi.string().min(5).max(200).required(),
+  country: joi.string().valid(...countries).required(),
   sex: joi.string().valid('M','F').required(),
   'g-recaptcha-response': joi.string().required()
 })
@@ -61,4 +62,36 @@ export const addmilestone_schema = joi.object().keys({
   amount: joi.number().integer().min(1).required(),
   date: joi.number().integer().required()
 })
+
+export const updateaccountdata_schema = joi.object().keys({
+  attribute: joi.string().valid('first_name', 'last_name', 'password', 'email', 'phone', 'address', 'country', 'sex').required(),
+  data: joi.when('attribute', {
+    is: joi.string().valid('first_name', 'last_name', 'password'),
+    then: joi.string().min(2).required(),
+    otherwise: joi.when('attribute', {
+      is: 'email',
+      then: joi.string().email({tlds: {allow: false}}).required(),
+      otherwise: joi.when('attribute', {
+        is: 'phone',
+        then: joi.number().integer().min(0).required(),
+        otherwise: joi.when('attribute', {
+          is: 'address',
+          then: joi.string().min(5).max(200).required(),
+          otherwise: joi.when('attribute', {
+            is: 'country',
+            then: joi.string().valid(...countries).required(),
+            otherwise: joi.when('attribute', {
+              is: 'sex',
+              then: joi.string().valid('M','F').required()
+            })
+          })
+        })
+      })
+    })
+  }).required()
+})
+
+
+
+
 

@@ -40,7 +40,6 @@ export default class Account {
     })
   }
 
-
   insertuser (data){
     return new Promise((resolve, reject) =>{
       this.pool.query(
@@ -114,6 +113,29 @@ export default class Account {
         `DELETE FROM account WHERE account_id = ?
         `,
         [
+          data.account_id
+        ],
+        (error, results, fields) => {
+          if (error) {
+            reject(error)
+          }else{
+            resolve(results)
+          }
+        }
+      );
+    })
+  }
+
+  updateaccountdata (data){
+    return new Promise((resolve, reject) =>{
+
+      var query = `UPDATE account SET ?? = ? WHERE account_id = ?`
+
+      this.pool.query(
+        query,
+        [
+          data.attribute,
+          data.data,
           data.account_id
         ],
         (error, results, fields) => {
