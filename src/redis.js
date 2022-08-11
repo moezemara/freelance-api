@@ -20,10 +20,10 @@ export const session = sessions({
     name: "SessionID",
     cookie: { 
       maxAge: config.session.expire, 
-      secure: config.appmode == "DEVELOPMENT" ? false : true, 
+      secure: true, 
       sameSite: true, 
       domain: config.session.domain,
-      httpOnly: false
+      httpOnly: true
     },
     store: new RedisStore({client: redisClient}),
     resave: false 
