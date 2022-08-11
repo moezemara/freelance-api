@@ -9,6 +9,7 @@ router.post("/login", schemaChecker.checkbody(schema.login_schema), login)
 router.post("/logout", logout)
 router.post("/signup", schemaChecker.checkbody(schema.signup_schema), signup)
 
+
 router.get("/account/profile") // get account details
 router.post("/account/update/password") // change account password
 router.post("/account/update/name") // change first and last name
