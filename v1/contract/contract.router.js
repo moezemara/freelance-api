@@ -18,14 +18,13 @@ router.get("/:contract_id", auth.basic, getcontract) // get contract data
 router.post("/:contract_id/cancel", auth.basic, cancelinterview) // cancel interview
 
 router.post("/:contract_id/updatestatus", auth.basic, schemaChecker.checkbody(schema.updatepeerstatus_schema), updatepeerstatus) // accept, cancel offer
-router.post("/:contract_id/updateprice") // update interview contract price (only when not pending acceptance)
 
 router.get("/:contract_id/milestone", auth.basic, getmilestones) // get milestones of a contract
 router.get("/:contract_id/milestone/:milestone_id", auth.basic, getmilestone) // get milestone data
 
-router.post("/:contract_id/milestone/add", auth.basic, schemaChecker.checkbody(schema.addmilestone_schema), addmilestone) // add milestone only to (pending and active contracts)
+router.post("/:contract_id/milestone/add", auth.basic, schemaChecker.checkbody(schema.addmilestone_schema), addmilestone) // add milestone only to interview contracts
 
-router.post("/:contract_id/milestone/:milestone_id/remove", auth.basic, deletemilestone) // 
+router.post("/:contract_id/milestone/:milestone_id/remove", auth.basic, deletemilestone) // remove milestone only from interview contracts
 router.post("/:contract_id/milestone/:milestone_id/end", auth.basic, endmilestone) // end milestone status
 
 router.post("/:contract_id/end", auth.basic, endcontract) // end contract only when active

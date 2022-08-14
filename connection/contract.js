@@ -142,10 +142,48 @@ export default class Contract {
     })
   }
 
+  updatecontractfinalprice (data){
+    return new Promise((resolve, reject) =>{
+
+      this.pool.query(
+        `UPDATE contract SET final_price = (SELECT SUM(amount) FROM milestone WHERE proposal_id = ?) WHERE proposal_id = ?`,
+        [
+          data.proposal_id,
+          data.proposal_id
+        ],
+        (error, results, fields) => {
+          if (error) {
+            reject(error)
+          }else{
+            resolve(results)
+          }
+        }
+      );
+    })
+  }
+
   cancelcontract (data){
     return new Promise((resolve, reject) =>{
       this.pool.query(
         `UPDATE contract SET status = 'Canceled' WHERE status = 'Interview' AND proposal_id = ?`,
+        [
+          data.proposal_id
+        ],
+        (error, results, fields) => {
+          if (error) {
+            reject(error)
+          }else{
+            resolve(results)
+          }
+        }
+      );
+    })
+  }
+
+  selectinternalmilestones (data){
+    return new Promise((resolve, reject) =>{
+      this.pool.query(
+        `SELECT * FROM milestone WHERE proposal_id = ?`,
         [
           data.proposal_id
         ],
@@ -191,7 +229,7 @@ export default class Contract {
         }
       );
     })
-  } 
+  }
 
   selectmilestones (data){
     return new Promise((resolve, reject) =>{
@@ -251,9 +289,10 @@ export default class Contract {
   deletemilestone (data){
     return new Promise((resolve, reject) =>{
       this.pool.query(
-        `UPDATE milestone SET status = 'Deleted' AND status = 'Pending' WHERE milestone_id = ?`,
+        `UPDATE milestone SET status = 'Deleted' AND status = 'Pending' WHERE milestone_id = ? AND proposal_id = ?`,
         [
-          data.milestone_id
+          data.milestone_id,
+          data.proposal_id
         ],
         (error, results, fields) => {
           if (error) {
@@ -269,9 +308,10 @@ export default class Contract {
   endmilestone (data){
     return new Promise((resolve, reject) =>{
       this.pool.query(
-        `UPDATE milestone SET status = 'Finished' WHERE status = 'Pending' AND milestone_id = ?`,
+        `UPDATE milestone SET status = 'Finished' WHERE status = 'Pending' AND milestone_id = ? AND proposal_id = ?`,
         [
-          data.milestone_id
+          data.milestone_id,
+          data.proposal_id
         ],
         (error, results, fields) => {
           if (error) {
@@ -301,7 +341,6 @@ export default class Contract {
       );
     })
   }
-
 
   selectcontractaccountnames (data){
     return new Promise((resolve, reject) =>{

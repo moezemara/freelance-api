@@ -87,7 +87,7 @@ export async function acceptproposal(req, res) {
     data.proposal_id = req.params.proposal_id
     data.client_profile_id = proposal.client_profile_id
     data.freelancer_profile_id = proposal.freelancer_profile_id
-    data.final_price = proposal.price
+    data.final_price = 0
 
     const result = await database.contract.insertcontract(data)
 
@@ -135,6 +135,15 @@ export async function cancelinterview(req, res) {
     if(!contract) return response.fail(res, "invalid contract")
     if(contract.status != 'Interview') return response.fail(res, "contract must be in interview")
 
+
+    if(contract.client_acceptance == 1){
+      const client_account = await database.account.selectuserbyprofileid({profile_id: contract.client_profile_id, account_type: "C"})
+      const newbalance = client_account.balance + contract.final_price
+      const escrowbalance = client_account.escrowbalance - contract.final_price
+      const updatebalance = await database.account.updateaccountdata({attribute: "balance", data: newbalance, account_id: client_account.account_id})
+      const updateescrowbalance = await database.account.updateaccountdata({attribute: "escrow_balance", data: escrowbalance, account_id: client_account.account_id}) 
+    }
+
     const result = await database.contract.cancelcontract({
       proposal_id: req.params.contract_id
     })
@@ -155,15 +164,33 @@ export async function updatepeerstatus(req, res) {
   try {
     const account_type = req.session.account_type;
     const input = req.body.input == 'Accept' ? 1 : 0
+    const account = await database.account.selectuserbyaccountid({account_id: req.session.account_id})
     const contract = await database.contract.selectcontract({account_id: req.session.account_id, account_type: req.session.account_type, proposal_id: req.params.contract_id})
     if(!contract) return response.fail(res, "invalid contract")
-    if(contract.status == 'Active') return response.fail(res, "contract is already active")
+    if(contract.status != 'Interview') return response.fail(res, "invalid contract operation")
     const status = interviewstatus.checkstatus(contract)
     
     // check what is possible
     const interview_result = interviewstatus.handlepermissions(res, status, account_type, input)
     if(interview_result) return interview_result
     
+
+    // update balance of client before accepting and after canceling
+    if(account_type == 'C' && input == 1 && contract.final_price > account.balance){
+      return response.fail(res, "insufficient balance")
+    }else if(account_type == 'C' && input == 1 && contract.final_price <=  account.balance){
+      const newbalance = account.balance - contract.final_price
+      const escrowbalance = account.escrowbalance + contract.final_price
+      const updatebalance = await database.account.updateaccountdata({attribute: "balance", data: newbalance, account_id: req.session.account_id})
+      const updateescrowbalance = await database.account.updateaccountdata({attribute: "escrow_balance", data: escrowbalance, account_id: req.session.account_id}) 
+    }else if(input == 0 && contract.client_acceptance == 1){
+      const client_account = await database.account.selectuserbyprofileid({profile_id: contract.client_profile_id, account_type: "C"})
+      const newbalance = client_account.balance + contract.final_price
+      const escrowbalance = client_account.escrowbalance - contract.final_price
+      const updatebalance = await database.account.updateaccountdata({attribute: "balance", data: newbalance, account_id: client_account.account_id})
+      const updateescrowbalance = await database.account.updateaccountdata({attribute: "escrow_balance", data: escrowbalance, account_id: client_account.account_id}) 
+    }
+
     // pre-updated status
     if(account_type == 'C'){
       var updated_contract = contract
@@ -176,6 +203,13 @@ export async function updatepeerstatus(req, res) {
     // check pre-updated status
     const pre_updated_status = interviewstatus.checkstatus(updated_contract)
     
+
+    if(pre_updated_status.status == 'Active'){
+      const freelancer_account = await database.account.selectuserbyprofileid({profile_id: contract.client_profile_id, account_type: "F"})
+      const freelancer_escrowbalance = freelancer_account.escrowbalance + contract.final_price
+      const update_freelancer_escrowbalance = await database.account.updateaccountdata({attribute: "escrow_balance", data: freelancer_escrowbalance, account_id: freelancer_account.account_id})  
+    }    
+
     // update if possible
     const update_result = await database.contract.updatepeerstatus({input: input, proposal_id: req.params.contract_id, status: pre_updated_status.status, account_type: account_type})
     if(update_result.affectedRows != 0){
@@ -228,7 +262,7 @@ export async function addmilestone(req, res) {
     // check if possible to add
     const contract = await database.contract.selectcontract({account_id: req.session.account_id, account_type: req.session.account_type, proposal_id: req.params.contract_id})
     if(!contract) return response.fail(res, "invalid contract")
-    if(contract.status != 'Interview') return response.fail(res, "you can not add on active contracts")
+    if(contract.status != 'Interview') return response.fail(res, "you are not allowed to edit")
     const status = interviewstatus.checkstatus(contract)
 
     if(status.special_status != 'NAN'){
@@ -244,6 +278,7 @@ export async function addmilestone(req, res) {
     }
 
     const milestones = await database.contract.insertmilestone(data)
+    await database.contract.updatecontractfinalprice({proposal_id: req.params.contract_id})
 
     return response.success(res)
   } catch (error) {
@@ -258,20 +293,20 @@ export async function deletemilestone(req, res) {
     // check if possible to add
     const contract = await database.contract.selectcontract({account_id: req.session.account_id, account_type: req.session.account_type, proposal_id: req.params.contract_id})
     if(!contract) return response.fail(res, "invalid contract")
-    if(contract.status != 'Interview') return response.fail(res, "you can not add on active contracts")
+    if(contract.status != 'Interview') return response.fail(res, "you are not allowed to edit")
     const status = interviewstatus.checkstatus(contract)
 
     if(status.special_status != 'NAN'){
       return response.fail(res, "you are not allowed to edit")
     }
 
-    const result = await database.contract.deletemilestone({milestone_id: req.params.milestone_id})
+    const result = await database.contract.deletemilestone({milestone_id: req.params.milestone_id, proposal_id: req.params.contract_id})
 
-    if(result.affectedRows != 0){
-      return response.success(res)
-    }else{
+    if(result.affectedRows == 0){
       return response.fail(res, "invalid milestone")
     }
+
+    await database.contract.updatecontractfinalprice({proposal_id: req.params.contract_id})
 
     return response.success(res)
   } catch (error) {
@@ -287,16 +322,40 @@ export async function endmilestone(req, res) {
     if(!contract) return response.fail(res, "invalid contract")
     if(contract.status != 'Active') return response.fail(res, "contract must be active")
 
-    const result = await database.contract.endmilestone({
-      milestone_id: req.params.milestone_id
+
+    const milestone = await database.contract.selectmilestone({
+      account_type: req.session.account_type, 
+      milestone_id: req.params.milestone_id, 
+      proposal_id: req.params.contract_id,
+      account_id: req.session.account_id
     })
 
-    if(result.affectedRows != 0){
-      return response.success(res)
-    }else{
+    if(milestone.length == 0) return response.fail(res, "invalid milestone")
+
+
+    const result = await database.contract.endmilestone({
+      milestone_id: req.params.milestone_id,
+      proposal_id: req.params.contract_id
+    })
+
+
+    if(result.affectedRows == 0){
       return response.fail(res, "invalid milestone")
     }
+
+    const client_account = await database.account.selectuserbyprofileid({profile_id: contract.client_profile_id, account_type: "C"})
+    const freelancer_account = await database.account.selectuserbyprofileid({profile_id: contract.client_profile_id, account_type: "F"})
     
+    const freelancer_newbalance = freelancer_account.balance + milestone.amount
+    const freelancer_escrowbalance = freelancer_account.escrowbalance - milestone.amount
+    const update_freelancer_balance = await database.account.updateaccountdata({attribute: "balance", data: freelancer_newbalance, account_id: freelancer_account.account_id})
+    const update_freelancer_escrowbalance = await database.account.updateaccountdata({attribute: "escrow_balance", data: freelancer_escrowbalance, account_id: freelancer_account.account_id})
+
+    const client_escrowbalance = client_account.escrowbalance - milestone.amount
+    const update_client_escrowbalance = await database.account.updateaccountdata({attribute: "escrow_balance", data: client_escrowbalance, account_id: client_account.account_id}) 
+  
+
+    return response.success(res)
   } catch (error) {
     return response.system(res, error)
   }
@@ -310,16 +369,41 @@ export async function endcontract(req, res) {
     if(!contract) return response.fail(res, "invalid contract")
     if(contract.status != 'Active') return response.fail(res, "contract must be active")
 
+
+    const milestones = await database.contract.selectinternalmilestones({proposal_id: req.params.contract_id})
+
+    var remaining_amount = 0
+
+    for (const milestone in milestones) {
+      if(milestone.status == "Reviewing"){
+        return response.fail(res, "please finish under review milestones first")
+      }else{
+        remaining_amount+= milestone.amount
+      }
+    }
+
     const result = await database.contract.endcontract({
       proposal_id: req.params.contract_id
     })
 
-    if(result.affectedRows != 0){
-      return response.success(res)
-    }else{
+    if(result.affectedRows == 0){
       return response.fail(res, "invalid contract")
     }
-    
+
+    if(remaining_amount != 0){
+      const client_account = await database.account.selectuserbyprofileid({profile_id: contract.client_profile_id, account_type: "C"})
+      const freelancer_account = await database.account.selectuserbyprofileid({profile_id: contract.client_profile_id, account_type: "F"})
+  
+      const freelancer_escrowbalance = freelancer_account.escrowbalance - remaining_amount
+      const update_freelancer_escrowbalance = await database.account.updateaccountdata({attribute: "escrow_balance", data: freelancer_escrowbalance, account_id: freelancer_account.account_id})
+      
+      const client_newbalance = client_account.balance + remaining_amount
+      const client_escrowbalance = client_account.escrowbalance - remaining_amount
+      const update_client_escrowbalance = await database.account.updateaccountdata({attribute: "escrow_balance", data: client_escrowbalance, account_id: client_account.account_id}) 
+      const update_client_balance = await database.account.updateaccountdata({attribute: "balance", data: client_newbalance, account_id: client_account.account_id})  
+    }
+
+    return response.success(res)
   } catch (error) {
     return response.system(res, error)
   }

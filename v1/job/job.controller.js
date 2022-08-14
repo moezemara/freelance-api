@@ -7,19 +7,25 @@ export async function createjob(req, res) {
   const data = req.body
 
   try {
+    const account = await database.account.selectuserbyaccountid({account_id: req.session.account_id})
     const profile = await database.client.selectprofile({account_id: req.session.account_id})
     if(!profile){return response.fail(res, "invalid profile")}
     
     data.job_id = randomUUID()
     data.profile_id = profile.profile_id
 
-    const result = await database.job.insertjob(data)
+    if(data.price > account.balance){
+      return response.fail(res, "insufficient balance")
+    }
 
-    if(result.affectedRows != 0){
-      return response.success(res, "job posted")
-    }else{
+    const insertjob = await database.job.insertjob(data)
+
+    if (insertjob.affectedRows == 0){
       return response.system(res, result)
     }
+    
+    return response.success(res, "job posted")
+
   } catch (error) {
     return response.system(res, error)
   }
