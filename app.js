@@ -92,6 +92,16 @@ app.use(function(err, req, res, next) {
   }
 })
 
+
+if(config.appmode == 'DEVELOPMENT'){
+  app.use(function(req, res, next) {
+    req.session.account_id = "7e81fbcc-ff88-4a97-96aa-bd4080cf8083"
+    req.session.account_type = "C"
+    req.session.verified = 0
+    req.session.banned = 0
+    next()
+  })
+}
 // app base routes
 app.use("/v1/global", globalRouter)
 app.use("/v1/user", userRouter)
