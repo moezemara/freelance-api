@@ -91,7 +91,11 @@ export const updateaccountdata_schema = joi.object().keys({
   }).required()
 })
 
+export const capturePayment_schema = joi.object().keys({
+  orderID: joi.string().required()
+})
 
 
-
-
+export const createorder_schema = joi.object().keys({
+  amount: joi.number().integer().min(10).required()
+})

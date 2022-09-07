@@ -346,8 +346,8 @@ export async function endmilestone(req, res) {
     const client_account = await database.account.selectuserbyprofileid({profile_id: contract.client_profile_id, account_type: "C"})
     const freelancer_account = await database.account.selectuserbyprofileid({profile_id: contract.client_profile_id, account_type: "F"})
     
-    const freelancer_newbalance = freelancer_account.balance + milestone.amount
-    const freelancer_escrowbalance = freelancer_account.escrowbalance - milestone.amount
+    const freelancer_newbalance = parseFloat(freelancer_account.balance) + parseFloat(milestone.amount)
+    const freelancer_escrowbalance = parseFloat(freelancer_account.escrowbalance) - parseFloat(milestone.amount)
     const update_freelancer_balance = await database.account.updateaccountdata({attribute: "balance", data: freelancer_newbalance, account_id: freelancer_account.account_id})
     const update_freelancer_escrowbalance = await database.account.updateaccountdata({attribute: "escrow_balance", data: freelancer_escrowbalance, account_id: freelancer_account.account_id})
 

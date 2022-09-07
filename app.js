@@ -18,6 +18,7 @@ import jobRouter from './v1/job/job.router.js'
 import contractRouter from './v1/contract/contract.router.js'
 import proposalRouter from './v1/proposal/proposal.router.js'
 import globalRouter from './v1/global/global.router.js'
+import paymentRouter from './v1/payment/payment.router.js'
 
 
 const app = express()
@@ -110,6 +111,7 @@ app.use("/v1/client", clientRouter)
 app.use("/v1/job", jobRouter)
 app.use("/v1/proposal", proposalRouter)
 app.use("/v1/contract", contractRouter)
+app.use("/v1/payment", paymentRouter)
 
 // handles all the unused links
 app.all("/*", (req, res) => {

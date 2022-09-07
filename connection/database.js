@@ -7,6 +7,7 @@ import Proposal from "./proposal.js"
 import Contract from "./contract.js"
 import Client from './client.js'
 import Global from './global.js'
+import Payment from './payment.js'
 
 const pool = createPool({
   port: config.database.port,
@@ -24,5 +25,6 @@ export default {
     job: new Job(pool),
     proposal: new Proposal(pool),
     contract: new Contract(pool),
+    payment: new Payment(pool),
     global: new Global(pool)
 }
